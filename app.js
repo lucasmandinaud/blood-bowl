@@ -1,0 +1,289 @@
+(() => {
+const SK = window.BB_SKILLS, RU = window.BB_RULES, TB = window.BB_TABLES, MO = window.BB_MODS, TE = window.BB_TEAMS, TR = window.BB_TEAM_RULES;
+const CATS = {A:"Agilité",F:"Force",G:"Générale",M:"Mutation",P:"Passe",S:"Scélérate",T:"Trait"};
+const $ = s => document.querySelector(s);
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const strip = h => h.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+
+SK.forEach(s => { s.id = "s-" + norm(s.n).replace(/[^a-z0-9]+/g,"-"); s.kind = "skill"; });
+RU.forEach(r => { r.kind = "rule"; r.id = "r-" + r.id; });
+const TEMO = window.BB_TABLE_EMOJI || {};
+TB.forEach(t => { const m = TEMO[t.id] || {}; t.e = m.e || "🎲"; t.re = m.r || {}; t.kind = "table"; t.id = "t-" + t.id; });
+const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-");
+TE.forEach(t => { t.kind = "team"; t.id = "e-" + slug(t.n); });
+Object.entries(TR).forEach(([k,v]) => { const r = {kind:"trule", id:"x-"+slug(k), t:k, d:v}; TR[k] = r; });
+const BY = {}; [...SK,...RU,...TB,...TE,...Object.values(TR)].forEach(x => BY[x.id] = x);
+// Associe "Solitaire (4+)" → Solitaire (X+), "Haine (Troll)" → Haine (X), etc.
+const skKey = s => norm(s.replace(/\(.*?\)/g,"")).replace(/[^a-z]/g,"");
+const SKMAP = {}; SK.forEach(s => SKMAP[skKey(s.n)] = s.id);
+const trKey = s => { if (/^Favoris de/.test(s)) return "x-favoris-de"; const k = Object.keys(TR).find(k => norm(s).startsWith(norm(k))); return k ? TR[k].id : null; };
+
+
+// ---------- Rendu d'une ligne ----------
+const dot = s => `<span class="dot" style="background:var(--c${s.cat})">${s.cat==="T"?"T":s.cat}</span>`;
+function skillTags(s){
+  let t = `<span class="tag">${s.act?"Actif":"Passif"}</span>`;
+  if (s.obl) t += `<span class="tag ob" title="Obligatoire">Oblig.</span>`;
+  if (s.elite) t += `<span class="tag el" title="Élite">Élite</span>`;
+  return t;
+}
+function rowSkill(s, hl){
+  const sub = hl ? highlight(snippet(s.d, hl), hl) : esc(CATS[s.cat]) + (s.cat==="T"?"":" · compétence");
+  return `<button class="item" data-id="${s.id}">${dot(s)}<span class="main"><span class="name">${hl?highlight(esc(s.n),hl):esc(s.n)}</span><span class="sub">${sub}</span></span><span class="tags">${skillTags(s)}</span></button>`;
+}
+function rowRule(r, hl){
+  const txt = strip(r.b);
+  const sub = hl ? highlight(snippet(txt, hl), hl) : "";
+  const icon = r.kind==="table" ? `<span class="dot emo">${r.e}</span>` : "";
+  return `<button class="item" data-id="${r.id}">${icon}<span class="main"><span class="name">${hl?highlight(esc(r.t),hl):esc(r.t)}</span>${sub?`<span class="sub">${sub}</span>`:""}</span></button>`;
+}
+function snippet(text, q){
+  const i = norm(text).indexOf(norm(q).split(" ")[0]);
+  if (i < 0) return esc(text.slice(0,90));
+  const a = Math.max(0, i-30);
+  return (a?"…":"") + esc(text.slice(a, a+100));
+}
+function highlight(html, q){
+  const words = norm(q).split(/\s+/).filter(w => w.length > 1);
+  if (!words.length) return html;
+  const n = norm(html);
+  const marks = [];
+  words.forEach(w => { let i = -1; while ((i = n.indexOf(w, i+1)) >= 0) marks.push([i, i+w.length]); });
+  marks.sort((a,b)=>a[0]-b[0]);
+  let out = "", last = 0;
+  marks.forEach(([a,b]) => { if (a < last) return; out += html.slice(last,a) + "<mark>" + html.slice(a,b) + "</mark>"; last = b; });
+  return out + html.slice(last);
+}
+
+// ---------- Vues ----------
+let cat = "all";
+function renderChips(){
+  const list = [["all","Tout"],...Object.entries(CATS)];
+  $("#chips").innerHTML = list.map(([k,v]) => `<button class="chip${cat===k?" on":""}" data-cat="${k}">${k!=="all"?`<i style="background:var(--c${k})"></i>`:""}${v}${k==="T"?"s":""}</button>`).join("");
+}
+function renderSkills(){
+  const list = SK.filter(s => cat==="all" || s.cat===cat).sort((a,b)=>a.n.localeCompare(b.n,"fr"));
+  let html = `<div class="count">${list.length} ${cat==="T"?"traits":cat==="all"?"compétences et traits":"compétences"}</div>`, L = "";
+  list.forEach(s => { const l = norm(s.n[0]).toUpperCase(); if (l !== L) { L = l; html += `<div class="letter">${l}</div>`; } html += rowSkill(s); });
+  $("#v-skills").innerHTML = html;
+}
+function renderRules(){
+  let html = "", g = "";
+  RU.forEach(r => { if (r.g !== g) { g = r.g; html += `<h2 class="group">${g}</h2>`; } html += rowRule(r); });
+  $("#v-rules").innerHTML = html;
+}
+function tableCard(t){
+  return `<div class="card"><h3><span>${t.e} ${esc(t.t)}</span> <span class="dice">${t.dice}</span></h3>${t.rows.map(r=>`<div class="row"><span class="r">${r[0]}</span><div><b>${t.re[r[1]] ? t.re[r[1]] + " " : ""}${esc(r[1])}</b><span>${esc(r[2])}</span></div></div>`).join("")}</div>`;
+}
+// ---------- Passes : diagramme des portées ----------
+const PASSCOL = {R:"#5fbf7a", C:"#e3c84a", L:"#e8893a", B:"#d4232f"};
+function passZone(x, y){
+  if (!x && !y) return "P";
+  const d = Math.hypot(x, y);
+  if (d < 3.5) return "R"; if (d < 7) return "C"; if (d < 10.25) return "L";
+  if (d < 12.9 || (Math.max(x,y) === 13 && Math.min(x,y) <= 2)) return "B";
+  return "";
+}
+function passChart(){
+  const s = 22, o = 20, n = 14, W = o + n*s;
+  let g = "";
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    const z = passZone(x, y), px = o + x*s, py = (n-1-y)*s;
+    const fill = z === "P" ? "#f1ebdd" : z ? PASSCOL[z] : "rgba(255,255,255,.04)";
+    g += `<rect x="${px+1}" y="${py+1}" width="${s-2}" height="${s-2}" rx="3" fill="${fill}"${z && z!=="P" ? ' fill-opacity=".9"' : ""}/>`;
+    if (z === "P") g += `<text x="${px+s/2}" y="${py+s/2+4}" text-anchor="middle" font-size="12">🏈</text>`;
+  }
+  for (let i = 0; i < n; i++) {
+    g += `<text x="${o+i*s+s/2}" y="${n*s+14}" text-anchor="middle" class="ax">${i}</text>`;
+    g += `<text x="${o-6}" y="${(n-1-i)*s+s/2+4}" text-anchor="end" class="ax">${i}</text>`;
+  }
+  return `<svg class="pchart" viewBox="0 0 ${W} ${n*s+20}" role="img" aria-label="Diagramme des portées de passe">${g}</svg>`;
+}
+function passCard(){
+  const leg = [["R","Rapide","0"],["C","Courte","−1"],["L","Longue","−2"],["B","Longue Bombe","−3"]]
+    .map(([k,t,m]) => `<div class="pz"><i style="background:${PASSCOL[k]}"></i><b>${t}</b><span>${m}</span></div>`).join("");
+  return `<div class="card pass">
+    <h3><span>🎯 Portées de passe</span> <span class="dice">CP</span></h3>
+    <div class="pleg">${leg}</div>
+    ${passChart()}
+    <p class="pnote">🏈 = le passeur. Cases d'écart vers la cible, dans n'importe quelle direction (le diagramme se retourne). Case à cheval sur deux zones : on prend la plus lointaine.</p>
+    <div class="m"><b>➖ Par adversaire qui Marque le passeur</b><span>−1</span></div>
+    <div class="m"><b>☀️ Très ensoleillé</b><span>−1</span></div>
+    <div class="m"><b>❄️ Blizzard</b><span>Rapide ou Courte seulement</span></div>
+    <div class="m"><b>🚀 Lancer de coéquipier</b><span>Rapide 0 · Courte −1 seulement</span></div>
+    <div class="sub3">Résultat du test</div>
+    <div class="m"><b>✅ Précise</b><span>Réussi ou 6 naturel : arrive sur la cible</span></div>
+    <div class="m"><b>↗️ Imprécise</b><span>Raté : Valdingue (3) depuis la cible</span></div>
+    <div class="m"><b>💥 Maladresse</b><span>1 (modifié ou naturel) : Rebond depuis le passeur + Turnover</span></div>
+    <div class="sub3">Interception & réception (AG)</div>
+    <div class="m"><b>🛑 Intercepter</b><span>Précise −3 · Imprécise −2 · −1 / Marqueur</span></div>
+    <div class="m"><b>🙌 Réceptionner</b><span>−1 / Marqueur · Rebond −1 · Renvoi −1</span></div>
+  </div>`;
+}
+function renderTables(){
+  let html = `<h2 class="group">🎲 Antisèche des jets</h2><div class="card mods">${MO.map(m=>`<div class="m"><b>${m.e ? m.e + " " : ""}${esc(m.t)}</b><span>${esc(m.v)}</span></div>`).join("")}</div>`;
+  html += `<h2 class="group">📊 Tableaux</h2>` + TB.map(tableCard).join("");
+  html += `<h2 class="group">🎯 Passes</h2>` + passCard();
+  $("#v-tables").innerHTML = html;
+}
+
+// ---------- Équipes ----------
+const fmtK = k => k >= 1000 ? (k/1000).toLocaleString("fr-FR") + " M" : k + " k";
+function rowTeam(t, sub){
+  const emo = (window.BB_TEAM_EMOJI||{})[t.n] || "🏈";
+  return `<button class="item" data-id="${t.id}"><span class="dot emo">${emo}</span><span class="main"><span class="name">${esc(t.n)}</span>${sub?`<span class="sub">${sub}</span>`:""}</span></button>`;
+}
+function renderTeams(){
+  $("#v-teams").innerHTML = `<div class="count">${TE.length} équipes · touchez pour voir les joueurs</div>` + TE.map(t => rowTeam(t)).join("");
+}
+function skillChips(str){
+  if (str === "—") return `<span class="none">Aucune</span>`;
+  return str.split(/,\s*/).map(s => { const id = SKMAP[skKey(s)]; return id ? `<a class="sk" data-id="${id}">${esc(s)}</a>` : `<span class="sk off">${esc(s)}</span>`; }).join("");
+}
+function playerCard(p){
+  const [q,n,kw,cost,M,F,AG,CP,AR,sk,pr,se] = p;
+  return `<div class="pl"><div class="plh"><span class="q">${q}</span><span class="pn">${esc(n)}</span><span class="pc">${cost} k</span></div>
+  <div class="kw">${esc(kw)}</div>
+  <div class="st"><div><small>M</small>${M}</div><div><small>F</small>${F}</div><div><small>AG</small>${AG}</div><div><small>CP</small>${CP}</div><div><small>AR</small>${AR}</div></div>
+  <div class="sks">${skillChips(sk)}</div>
+  <div class="acc"><span><b>Principales</b> ${esc(pr)}</span><span><b>Secondaires</b> ${esc(se)}</span></div></div>`;
+}
+function teamBody(t){
+  const rules = t.sr.length ? t.sr.map(s => { const id = trKey(s); return id ? `<a class="sk" data-id="${id}">${esc(s)}</a>` : `<span class="sk off">${esc(s)}</span>`; }).join("") : `<span class="none">Aucune</span>`;
+  return `<div class="tinfo"><div><small>Relance d'équipe</small><b>${t.rr} 000 po</b><span>0-8</span></div><div><small>Apothicaire</small><b>${t.apo?"Oui":"Non"}</b></div></div>
+  <p class="lbl">Ligues</p><p>${esc(t.lg)}</p>
+  <p class="lbl">Règles spéciales</p><div class="sks">${rules}</div>
+  ${t.bigNote?`<p class="note">${esc(t.bigNote)}</p>`:""}
+  <p class="lbl">Joueurs</p>${t.pl.map(playerCard).join("")}
+  <p class="note">Compétences : A Agilité · F Force · G Générale · M Mutation · P Passe · S Scélérate.</p>
+  <div class="src">Fiche d'équipe · livre de règles p. ${t.p}</div>`;
+}
+
+// ---------- Recherche ----------
+function score(text, words){ const n = norm(text); return words.every(w => n.includes(w)); }
+function renderSearch(q){
+  const words = norm(q).split(/\s+/).filter(Boolean);
+  const nameHits = [], textHits = [];
+  SK.forEach(s => { if (score(s.n, words)) nameHits.push(s); else if (score(s.n+" "+s.d+" "+CATS[s.cat], words)) textHits.push(s); });
+  const ruleName = [], ruleText = [];
+  [...RU,...TB].forEach(r => {
+    const body = r.kind==="table" ? r.rows.map(x=>x.join(" ")).join(" ") : strip(r.b);
+    if (score(r.t+" "+(r.k||""), words)) ruleName.push(r); else if (score(body, words)) ruleText.push(r);
+  });
+  const teamHits = [];
+  TE.forEach(t => {
+    if (score(t.n+" "+t.lg+" "+t.sr.join(" "), words)) { teamHits.push([t, null]); return; }
+    const pls = t.pl.filter(p => score(p[1]+" "+p[2], words));
+    if (pls.length) teamHits.push([t, pls.map(p=>p[1]).join(", ")]);
+  });
+  const sk = [...nameHits, ...textHits], ru = [...ruleName, ...ruleText];
+  let html = "";
+  if (sk.length) html += `<h2 class="group">Compétences & Traits · ${sk.length}</h2>` + sk.map(s=>rowSkill(s, nameHits.includes(s)?null:q)).join("");
+  if (teamHits.length) html += `<h2 class="group">Équipes · ${teamHits.length}</h2>` + teamHits.map(([t,s]) => rowTeam(t, s ? highlight(esc(s), q) : null)).join("");
+  if (ru.length) html += `<h2 class="group">Règles & Tableaux · ${ru.length}</h2>` + ru.map(r=>rowRule(r, q)).join("");
+  $("#v-search").innerHTML = html || `<div class="empty">Rien trouvé pour « ${esc(q)} ».</div>`;
+}
+
+// ---------- Fiche détaillée ----------
+const NOLINK = new Set(["Passe","Blocage","Réception","Saut","Lancer de Coéquipier"]);
+const NAMES = SK.filter(s => !NOLINK.has(s.n)).map(s => ({id:s.id, re: s.n.replace(/ \(X\+?\)/,"")})).sort((a,b)=>b.re.length-a.re.length);
+function linkify(text, selfId){
+  let html = esc(text);
+  const used = new Set();
+  NAMES.forEach(({id,re}) => {
+    if (id === selfId || used.has(id)) return;
+    const rx = new RegExp(`(^|[\\s(])(${re.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})(?![\\wÀ-ÿ])`);
+    if (rx.test(html)) { html = html.replace(rx, `$1<a class="x" data-id="${id}">$2</a>`); used.add(id); }
+  });
+  return html;
+}
+let stack = [];
+let scrolls = [];
+function open(id){ const x = BY[id]; if (!x) return; if (stack.length) scrolls[stack.length-1] = $("#sBody").scrollTop; stack.push(id); render(); }
+function render(){
+  const id = stack[stack.length-1], x = BY[id];
+  $("#sBack").classList.toggle("on", stack.length > 1);
+  $("#sheet").classList.toggle("tall", x.kind === "team");
+  if (x.kind === "skill") {
+    $("#sDot").outerHTML = `<div class="dot" id="sDot" style="background:var(--c${x.cat})">${x.cat}</div>`;
+    $("#sTitle").textContent = x.n;
+    $("#sMeta").textContent = `${x.cat==="T"?"Trait":"Compétence "+CATS[x.cat]} · ${x.act?"Actif":"Passif"}${x.obl?" · obligatoire (*)":""}${x.elite?" · Élite":""}`;
+    $("#sBody").innerHTML = `<p>${linkify(x.d, x.id)}</p>
+      <p class="note">${x.act?"Actif : utilisable seulement Debout et non Déconcentré (sauf mention contraire).":"Passif : s'applique toujours, quel que soit l'état du joueur."}${x.obl?" Obligatoire : doit être utilisé dès qu'il s'applique.":""}</p>
+      <div class="src">Résumé · livre de règles p. ${x.p}</div>`;
+  } else if (x.kind === "rule") {
+    $("#sDot").outerHTML = `<div class="dot" id="sDot" style="background:var(--surface2);color:var(--gold)">§</div>`;
+    $("#sTitle").textContent = x.t;
+    $("#sMeta").textContent = x.g;
+    $("#sBody").innerHTML = x.b + `<div class="src">Résumé · livre de règles p. ${x.p}</div>`;
+  } else if (x.kind === "team") {
+    $("#sDot").outerHTML = `<div class="dot emo" id="sDot">${(window.BB_TEAM_EMOJI||{})[x.n] || "🏈"}</div>`;
+    $("#sTitle").textContent = x.n;
+    $("#sMeta").textContent = `Équipe · ${x.pl.length} postes`;
+    $("#sBody").innerHTML = teamBody(x);
+  } else if (x.kind === "trule") {
+    $("#sDot").outerHTML = `<div class="dot" id="sDot" style="background:var(--surface2);color:var(--gold)">★</div>`;
+    $("#sTitle").textContent = x.t;
+    $("#sMeta").textContent = "Règle spéciale d'équipe";
+    $("#sBody").innerHTML = `<p>${esc(x.d)}</p><div class="src">Résumé · livre de règles p. 154-155</div>`;
+  } else {
+    $("#sDot").outerHTML = `<div class="dot emo" id="sDot">${x.e}</div>`;
+    $("#sTitle").textContent = x.t;
+    $("#sMeta").textContent = "Tableau · " + x.dice;
+    $("#sBody").innerHTML = tableCard(x).replace('class="card"','class="card" style="padding:0;background:none"').replace(/<h3>.*?<\/h3>/,"") + `<div class="src">Résumé · livre de règles p. ${x.p}</div>`;
+  }
+  $("#sBody").scrollTop = scrolls[stack.length-1] || 0;
+  if (!$("#sheet").classList.contains("on")) { $("#scrim").classList.add("on"); $("#sheet").classList.add("on"); }
+}
+function close(){ $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); stack = []; scrolls = []; }
+// Fermer une fiche ramène à la précédente (ex : compétence → équipe)
+function back(){ if (stack.length > 1) { scrolls.length = stack.length - 1; stack.pop(); render(); } else close(); }
+
+
+// ---------- Navigation ----------
+let tab = "skills";
+function show(t){
+  tab = t;
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab===t));
+  const q = $("#q").value.trim();
+  const view = q ? "search" : t;
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.id==="v-"+view));
+  $("#chips").classList.toggle("off", !!q || t!=="skills");
+  setHH();
+}
+function setHH(){ document.documentElement.style.setProperty("--hh", $("header").offsetHeight + "px"); }
+
+// ---------- Évènements ----------
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-id]");
+  if (a) { e.preventDefault(); open(a.dataset.id); return; }
+  const c = e.target.closest("[data-cat]");
+  if (c) { cat = c.dataset.cat; renderChips(); renderSkills(); window.scrollTo(0,0); return; }
+  const n = e.target.closest("nav button");
+  if (n) { if ($("#q").value) { $("#q").value=""; $("#searchBox").classList.remove("has"); } show(n.dataset.tab); window.scrollTo(0,0); }
+});
+$("#scrim").addEventListener("click", back);
+$("#q").addEventListener("input", e => {
+  const q = e.target.value.trim();
+  $("#searchBox").classList.toggle("has", !!e.target.value);
+  if (q) renderSearch(q);
+  show(tab);
+  window.scrollTo(0,0);
+});
+$("#q").addEventListener("keydown", e => { if (e.key==="Enter") e.target.blur(); });
+$("#clear").addEventListener("click", () => { $("#q").value=""; $("#searchBox").classList.remove("has"); show(tab); $("#q").focus(); });
+$("#sBack").addEventListener("click", back);
+$("#sClose").addEventListener("click", back);
+window.addEventListener("resize", setHH);
+
+// Glisser la fiche vers le bas pour fermer
+let y0 = null;
+$("#sheet").addEventListener("touchstart", e => { if ($("#sBody").scrollTop <= 0) y0 = e.touches[0].clientY; }, {passive:true});
+$("#sheet").addEventListener("touchmove", e => { if (y0===null) return; const dy = e.touches[0].clientY - y0; if (dy > 0) $("#sheet").style.transform = `translateY(${dy}px)`; }, {passive:true});
+$("#sheet").addEventListener("touchend", e => { if (y0===null) return; const dy = e.changedTouches[0].clientY - y0; $("#sheet").style.transform = ""; y0 = null; if (dy > 90) back(); });
+
+renderChips(); renderSkills(); renderRules(); renderTables(); renderTeams(); show("skills");
+
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
+})();
