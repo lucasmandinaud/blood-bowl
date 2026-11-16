@@ -144,6 +144,68 @@ nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:rg
 nav button{flex:1;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:var(--muted);font-weight:600}
 nav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8}
 nav button.on{color:var(--gold)}
+
+/* Chrono de match */
+body.has-pill{padding-bottom:calc(140px + var(--safe-b))}
+.pill{position:fixed;left:10px;right:10px;bottom:calc(60px + var(--safe-b) + 8px);z-index:32;display:none;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--line);border-left:5px solid var(--tc);border-radius:16px;padding:6px 6px 6px 12px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.pill.on{display:flex}
+.pill #pOpen{flex:1;min-width:0;text-align:left;display:flex;flex-direction:column}
+.pill #pName{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill #pTime{font-size:24px;font-weight:850;font-variant-numeric:tabular-nums;line-height:1.1}
+.pill #pPause{width:44px;height:44px;border-radius:12px;background:var(--surface);font-size:18px}
+.pill #pEnd{height:44px;padding:0 14px;border-radius:12px;background:var(--text);color:var(--bg);font-weight:800;font-size:15px}
+.pill.warn #pTime{color:var(--gold)}
+.pill.over{border-color:var(--accent);animation:tmPulse 1s infinite}
+.pill.over #pTime{color:var(--accent)}
+.pill.paused #pTime{opacity:.5}
+@keyframes tmPulse{50%{background:#3a1a1c}}
+.stimer{display:none;align-self:center;align-items:center;gap:6px;margin:4px auto 0;font-size:13px;color:var(--muted);background:var(--surface2);border-radius:12px;padding:3px 10px;font-variant-numeric:tabular-nums}
+.stimer.on{display:flex}
+.stimer i{width:8px;height:8px;border-radius:4px;background:var(--tc)}
+.stimer b{color:var(--text)}.stimer.warn b{color:var(--gold)}.stimer.over b{color:var(--accent)}
+.tm-card{display:flex;flex-direction:column;gap:12px}
+.tm-seg{display:flex;background:var(--bg);border-radius:11px;padding:3px;gap:3px}
+.tm-seg button{flex:1;height:36px;border-radius:9px;font-size:14px;font-weight:650;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
+.tm-seg button.on{background:var(--surface2);color:var(--text)}
+.tm-step{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tm-step b{display:block;font-size:15px}.tm-step small{display:block;font-size:12.5px;color:var(--muted)}
+.tm-ctl{display:flex;align-items:center;gap:4px;flex:none}
+.tm-ctl button{width:40px;height:40px;border-radius:12px;background:var(--surface2);font-size:22px;font-weight:600}
+.tm-ctl output{min-width:64px;text-align:center;font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+.tm-res{background:var(--surface2);border-left:3px solid var(--gold);border-radius:8px;padding:10px 12px;font-size:14px}
+.tm-res b{color:var(--gold)}
+.tm-tog{display:flex;align-items:center;gap:12px;text-align:left}
+.tm-tog span{flex:1}.tm-tog b{display:block;font-size:15px}.tm-tog small{display:block;font-size:12.5px;color:var(--muted)}
+.tm-tog i{flex:none;width:50px;height:30px;border-radius:15px;background:var(--line);position:relative;transition:background .2s}
+.tm-tog i:after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:12px;background:#fff;transition:transform .2s}
+.tm-tog.on i{background:var(--cS)}.tm-tog.on i:after{transform:translateX(20px)}
+.tm-name{display:flex;align-items:center;gap:10px}
+.tm-name i{width:12px;height:12px;border-radius:6px;flex:none}
+.tm-name input{flex:1;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:16px;padding:0 12px;outline:none}
+.tm-name input:focus{border-color:var(--gold)}
+.tm-big{display:block;width:100%;height:58px;border-radius:14px;background:var(--accent);color:#fff;font-size:19px;font-weight:850;margin:4px 0 10px;letter-spacing:.02em}
+.tm-big:active{opacity:.8}
+.tm-main{background:var(--surface);border-radius:18px;border-top:6px solid var(--tc);padding:16px;text-align:center;margin-bottom:12px}
+.tm-who{display:flex;justify-content:center;align-items:center;gap:8px;font-weight:750;font-size:18px}
+.tm-who i{width:12px;height:12px;border-radius:6px;background:var(--tc)}
+.tm-p{font-size:11px;font-weight:800;background:var(--gold);color:var(--bg);border-radius:6px;padding:2px 6px;letter-spacing:.06em}
+.tm-time{font-size:76px;font-weight:850;font-variant-numeric:tabular-nums;line-height:1.05;margin:6px 0 10px;letter-spacing:-.02em}
+.tm-main.warn .tm-time{color:var(--gold)}
+.tm-main.over{animation:tmPulse 1s infinite}.tm-main.over .tm-time{color:var(--accent)}
+.tm-bar{height:8px;border-radius:4px;background:var(--bg);overflow:hidden}
+.tm-bar i{display:block;height:100%;background:var(--tc);transition:width .25s linear}
+.tm-info{font-size:13px;color:var(--muted);margin-top:8px;min-height:18px}
+.tm-row{display:flex;gap:8px;margin-bottom:12px}
+.tm-row button{flex:1;height:46px;border-radius:12px;background:var(--surface);font-weight:650;font-size:15px}
+.tm-row button:disabled{opacity:.35}
+.tm-score{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.tm-score>div{background:var(--surface);border-radius:12px;padding:10px 12px;border-top:3px solid;display:flex;flex-direction:column;gap:3px}
+.tm-score b{display:flex;align-items:center;gap:6px;font-size:15px;margin-bottom:2px;overflow:hidden;white-space:nowrap}
+.tm-score b i{width:8px;height:8px;border-radius:4px;flex:none}
+.tm-score span{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.tm-score em{font-style:normal;font-weight:750;color:var(--text);font-variant-numeric:tabular-nums}
+.tm-score em.red{color:var(--accent)}
+.tm-link{display:block;margin:6px auto 20px;color:var(--muted);font-size:14px;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -162,14 +224,22 @@ nav button.on{color:var(--gold)}
   <section class="view" id="v-rules"></section>
   <section class="view" id="v-tables"></section>
   <section class="view" id="v-teams"></section>
+  <section class="view" id="v-match"></section>
   <section class="view" id="v-search"></section>
 </main>
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
+  <div class="stimer" id="sTimer"></div>
   <div class="head"><button class="hb back" id="sBack" aria-label="Retour">‹</button><div class="dot" id="sDot"></div><div class="ttl"><h2 id="sTitle"></h2><div class="meta" id="sMeta"></div></div><button class="hb" id="sClose" aria-label="Fermer">×</button></div>
   <div class="body" id="sBody"></div>
+</div>
+
+<div class="pill" id="pill">
+  <button id="pOpen" aria-label="Ouvrir le chrono"><span id="pName"></span><span id="pTime"></span></button>
+  <button id="pPause" aria-label="Pause">⏸</button>
+  <button id="pEnd">Fin du tour</button>
 </div>
 
 <nav>
@@ -177,11 +247,13 @@ nav button.on{color:var(--gold)}
   <button data-tab="rules"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>Règles</button>
   <button data-tab="tables"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3"/><circle cx="15" cy="15" r="1.3"/><circle cx="15" cy="9" r="1.3"/><circle cx="9" cy="15" r="1.3"/></svg>Tableaux</button>
   <button data-tab="teams"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Équipes</button>
+  <button data-tab="match"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M10 3h4M12 3v3M18.5 6.5l1.5-1.5"/></svg>Match</button>
 </nav>
 
 <script src="data-skills.js"></script>
 <script src="data-rules.js"></script>
 <script src="data-teams.js"></script>
 <script src="app.js"></script>
+<script src="timer.js"></script>
 </body>
 </html>

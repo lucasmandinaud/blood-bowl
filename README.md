@@ -14,7 +14,8 @@ C'est une web app installable (PWA) qui fonctionne hors-ligne.
 | `data-rules.js` | Règles, tableaux (météo, coup d'envoi…), antisèche |
 | `data-teams.js` | Équipes, joueurs, emojis des équipes |
 | `app.js` / `index.html` | Affichage et design |
+| `timer.js` | Chrono de match (onglet Match) |
 
-Après une modification, augmentez `VERSION` dans `sw.js` (ex : `bb-v12`) pour que les téléphones récupèrent la nouvelle version.
+Après une modification, augmentez `VERSION` dans `sw.js` (ex : `bb-v13`) pour que les téléphones récupèrent la nouvelle version.
 
 Les textes sont des résumés rédigés pour l'aide-mémoire. En cas de doute, c'est le livre de règles officiel qui fait foi.

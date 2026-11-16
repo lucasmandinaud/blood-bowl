@@ -250,6 +250,7 @@ function show(t){
   const view = q ? "search" : t;
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.id==="v-"+view));
   $("#chips").classList.toggle("off", !!q || t!=="skills");
+  document.dispatchEvent(new CustomEvent("bb:view", {detail: view}));
   setHH();
 }
 function setHH(){ document.documentElement.style.setProperty("--hh", $("header").offsetHeight + "px"); }
