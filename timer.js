@@ -8,9 +8,13 @@ const KEY = "bb-timer";
 const TURNS = 8;                       // tours par coach et par mi-temps
 const COL = ["var(--cA)", "var(--cF)"];
 
-const DEF_CFG = { mode:"total", totalMin:120, setupMin:15, turnMin:4, carry:true, cap:2, names:["Coach 1","Coach 2"], first:0 };
+const DEF_CFG = { mode:"total", totalMin:120, setupMin:15, turnMin:4, carry:false, cap:0, names:["Coach 1","Coach 2"], first:0, v:2 };
 let cfg = {...DEF_CFG}, st = {phase:"setup"};
-try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) { cfg = {...DEF_CFG, ...s.cfg}; st = s.st || st; } } catch(e){}
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) {
+  cfg = {...DEF_CFG, ...s.cfg}; st = s.st || st;
+  // Nouveaux réglages par défaut (crédit décoché, sans plafond), appliqués une fois aux téléphones déjà configurés
+  if (!s.cfg || s.cfg.v !== 2) { cfg.carry = false; cfg.cap = 0; cfg.v = 2; localStorage.setItem(KEY, JSON.stringify({cfg, st})); }
+} } catch(e){}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify({cfg, st})); } catch(e){} };
 
 // ---------- Calculs ----------
