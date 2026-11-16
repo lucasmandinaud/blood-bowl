@@ -8,7 +8,7 @@ const KEY = "bb-timer";
 const TURNS = 8;                       // tours par coach et par mi-temps
 const COL = ["var(--cA)", "var(--cF)"];
 
-const DEF_CFG = { mode:"total", totalMin:120, setupMin:15, turnMin:4, carry:true, names:["Coach 1","Coach 2"], first:0 };
+const DEF_CFG = { mode:"total", totalMin:120, setupMin:15, turnMin:4, carry:true, cap:2, names:["Coach 1","Coach 2"], first:0 };
 let cfg = {...DEF_CFG}, st = {phase:"setup"};
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) { cfg = {...DEF_CFG, ...s.cfg}; st = s.st || st; } } catch(e){}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify({cfg, st})); } catch(e){} };
@@ -67,7 +67,7 @@ async function wake(on){
 // ---------- Actions ----------
 function start(){
   unlockAudio();
-  st = { phase:"running", half:1, idx:0, first:cfg.first, base:baseMs(), carry:cfg.carry, bank:[0,0], over:[0,0], used:[0,0],
+  st = { phase:"running", half:1, idx:0, first:cfg.first, base:baseMs(), carry:cfg.carry, cap:cfg.carry && cfg.cap ? cfg.cap * baseMs() : 0, bank:[0,0], over:[0,0], used:[0,0],
          turnStart:now(), pausedAcc:0, pauseAt:null, log:[], matchStart:now(), warned:0 };
   commit();
 }
@@ -78,7 +78,7 @@ function endTurn(){
   st.log.push({w, used, bank:st.bank[w], over:st.over[w]});
   st.used[w] += used;
   if (rem < 0) st.over[w] += -rem;
-  if (st.carry) st.bank[w] = Math.max(0, rem);
+  if (st.carry) st.bank[w] = st.cap ? Math.min(st.cap, Math.max(0, rem)) : Math.max(0, rem);
   st.idx++;
   st.warned = 0;
   if (st.idx >= 2 * TURNS) { st.phase = st.half === 1 ? "half" : "done"; st.turnStart = null; if (st.phase === "done") st.matchEnd = now(); }
@@ -135,7 +135,8 @@ function setupView(){
         stepper("setupMin", "Réserve hors tours", cfg.setupMin + " min", "Coups d'envoi, mises en place, mi-temps")
       : stepper("turnMin", "Durée d'un tour", String(cfg.turnMin).replace(".", ",") + " min")}
     <div class="tm-res">${res}</div>
-    <button class="tm-tog${cfg.carry?" on":""}" data-tt="carry"><span><b>Reporter le temps non utilisé</b><small>Un tour rapide donne du crédit au tour suivant du même coach (comme une pendule d'échecs).</small></span><i></i></button>
+    <button class="tm-tog${cfg.carry?" on":""}" data-tt="carry"><span><b>Réserve de temps</b><small>Le temps non utilisé (tour rapide, turnover) est mis de côté. Il ne sert que si un tour dépasse son temps de base.</small></span><i></i></button>
+    ${cfg.carry ? stepper("cap", "Plafond de la réserve", cfg.cap ? fmt(cfg.cap * b) : "Aucun", cfg.cap ? `${cfg.cap} tour${cfg.cap > 1 ? "s" : ""} de base` : "La réserve peut grossir sans limite") : ""}
   </div>
   <h2 class="group">🏈 Coachs</h2>
   <div class="card tm-card">
@@ -148,7 +149,7 @@ function setupView(){
 }
 function scoreCards(){
   return `<div class="tm-score">${[0,1].map(i => `<div style="border-color:${COL[i]}"><b><i style="background:${COL[i]}"></i>${esc(cfg.names[i])}</b>
-    ${st.carry ? `<span>Crédit <em id="tmBank${i}">${fmt(st.bank[i])}</em></span>` : ""}
+    ${st.carry ? `<span>Réserve <em id="tmBank${i}">${fmt(st.bank[i])}</em></span>` : ""}
     <span>Temps joué <em>${fmtLong(st.used[i])}</em></span>
     <span>Dépassements <em class="${st.over[i] ? "red" : ""}">${st.over[i] ? fmt(st.over[i]).replace("+","") : "0:00"}</em></span></div>`).join("")}</div>`;
 }
@@ -160,6 +161,7 @@ function runView(){
     <div class="tm-time" id="tmTime">${fmt(remaining())}</div>
     <div class="tm-bar"><i id="tmBar"></i></div>
     <div class="tm-info" id="tmInfo"></div>
+    ${st.carry ? `<div class="tm-res2" id="tmRes"></div>` : ""}
   </div>
   <button class="tm-big" data-ta="end">Fin du tour ⏭</button>
   <div class="tm-row">
@@ -199,29 +201,39 @@ function tick(){
   document.body.classList.toggle("has-pill", showPill);
   sT.classList.toggle("on", live);
   if (!live) { pill.className = "pill"; return; }
-  const w = who(), rem = remaining(), all = allowance(), txt = fmt(rem);
-  const state = rem < 0 ? "over" : rem < 30000 ? "warn" : "";
-  // Alertes sonores : 30 s restantes, puis temps écoulé
+  const w = who(), rem = remaining(), all = allowance();
+  // Temps de base d'abord, puis la réserve fond, puis dépassement
+  const baseRem = st.base - elapsed(), bank = st.carry ? st.bank[w] : 0;
+  const inRes = baseRem <= 0 && rem > 0 && bank > 0;
+  const resNow = inRes ? rem : bank;
+  const shown = baseRem > 0 ? baseRem : rem;
+  const txt = fmt(shown);
+  const state = rem <= 0 ? "over" : inRes ? "res" : (rem < 30000 ? "warn" : "");
+  // Alertes sonores : 30 s restantes (ou entrée dans la réserve), puis temps écoulé
   if (st.phase === "running") {
-    if (rem < 30000 && rem > 0 && all > 45000 && st.warned < 1) { st.warned = 1; save(); beep(1); }
+    if (inRes && st.warned < 1) { st.warned = 1; save(); beep(1, 660); }
+    if (!bank && rem < 30000 && rem > 0 && all > 45000 && st.warned < 1) { st.warned = 1; save(); beep(1); }
     if (rem <= 0 && st.warned < 2) { st.warned = 2; save(); beep(3, 1040); }
   }
   // Pastille flottante
   pill.style.setProperty("--tc", COL[w]);
   pill.className = "pill " + (showPill ? "on " : "") + state + (st.phase === "paused" ? " paused" : "");
-  $("#pName").textContent = cfg.names[w] + " · T" + (Math.floor(st.idx/2)+1) + (st.phase === "paused" ? " · pause" : "");
-  $("#pTime").textContent = txt;
+  $("#pName").textContent = cfg.names[w] + " · T" + (Math.floor(st.idx/2)+1) + (st.phase === "paused" ? " · pause" : inRes ? " · réserve" : "");
+  $("#pTime").innerHTML = esc(txt) + (st.carry && (bank || inRes) && baseRem > 0 ? ` <small>+ ${fmt(resNow)}</small>` : "");
   $("#pPause").textContent = st.phase === "paused" ? "▶" : "⏸";
   // Rappel dans les fiches
   sT.style.setProperty("--tc", COL[w]);
   sT.className = "stimer on " + state;
-  sT.innerHTML = `<i></i>${esc(cfg.names[w])} · <b>${txt}</b>`;
+  sT.innerHTML = `<i></i>${esc(cfg.names[w])} · <b>${txt}</b>${inRes ? " · réserve" : st.carry && bank && baseRem > 0 ? ` <span>+ ${fmt(bank)}</span>` : ""}`;
   // Vue Match
   const t = $("#tmTime"); if (!t) return;
   t.textContent = txt;
   $("#tmMain").className = "tm-main " + state;
-  $("#tmBar").style.width = Math.max(0, Math.min(100, rem / all * 100)) + "%";
-  $("#tmInfo").textContent = rem < 0 ? "Temps écoulé !" : st.carry && st.bank[w] ? `dont ${fmt(st.bank[w])} de crédit` : `sur ${fmt(all)}`;
+  $("#tmBar").style.width = Math.max(0, Math.min(100, (inRes ? rem / bank : baseRem / st.base) * 100)) + "%";
+  $("#tmInfo").textContent = rem <= 0 ? "Temps écoulé !" : inRes ? "Temps de base écoulé · la réserve est utilisée" : `Temps de base · ${fmt(st.base)}`;
+  const bk = $("#tmBank" + w); if (bk) bk.textContent = fmt(Math.max(0, resNow));
+  const r = $("#tmRes");
+  if (r) { r.className = "tm-res2" + (inRes ? " on" : "") + (rem <= 0 ? " empty" : ""); r.innerHTML = `<span>🔋 Réserve</span><b>${fmt(Math.max(0, resNow))}</b>${st.cap ? `<small>max ${fmt(st.cap)}</small>` : ""}`; }
   // Fin estimée si chacun utilise tout son temps
   const left = 4 * TURNS - ((st.half - 1) * 2 * TURNS + st.idx) - 1;
   const eta = now() + Math.max(0, rem) + left * st.base + (st.carry ? st.bank[1 - w] : 0);
@@ -237,7 +249,7 @@ document.addEventListener("click", e => {
   const k = e.target.closest("[data-tk]");
   if (k) {
     const d = +k.dataset.d, key = k.dataset.tk;
-    const R = { totalMin:[15, 30, 480], setupMin:[5, 0, 60], turnMin:[0.5, 1, 10] }[key];
+    const R = { totalMin:[15, 30, 480], setupMin:[5, 0, 60], turnMin:[0.5, 1, 10], cap:[1, 0, 5] }[key];
     cfg[key] = Math.min(R[2], Math.max(R[1], cfg[key] + d * R[0]));
     if (cfg.setupMin > cfg.totalMin - 30) cfg.setupMin = Math.max(0, cfg.totalMin - 30);
     save(); render(); return;
