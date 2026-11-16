@@ -81,6 +81,7 @@ function start(){
 function endTurn(){
   if (st.phase !== "running" && st.phase !== "paused") return;
   unlockAudio();
+  if (!confirm(`Terminer le tour de ${cfg.names[who()]} ?\n\nLe chrono passe à ${cfg.names[1 - who()]}.`)) return;
   const w = who(), used = elapsed(), rem = allowance() - used;
   st.log.push({w, used, bank:st.bank[w], over:st.over[w]});
   st.used[w] += used;
