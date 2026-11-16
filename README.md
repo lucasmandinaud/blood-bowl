@@ -16,6 +16,6 @@ C'est une web app installable (PWA) qui fonctionne hors-ligne.
 | `app.js` / `index.html` | Affichage et design |
 | `timer.js` | Chrono de match (onglet Match) |
 
-Après une modification, augmentez `VERSION` dans `sw.js` (ex : `bb-v20`) pour que les téléphones récupèrent la nouvelle version.
+Après une modification, augmentez `VERSION` dans `sw.js` (ex : `bb-v21`) pour que les téléphones récupèrent la nouvelle version.
 
 Les textes sont des résumés rédigés pour l'aide-mémoire. En cas de doute, c'est le livre de règles officiel qui fait foi.
