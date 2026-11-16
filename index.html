@@ -191,12 +191,22 @@ body.has-pill{padding-bottom:calc(140px + var(--safe-b))}
 .tm-p{font-size:11px;font-weight:800;background:var(--gold);color:var(--bg);border-radius:6px;padding:2px 6px;letter-spacing:.06em}
 .tm-time{font-size:76px;font-weight:850;font-variant-numeric:tabular-nums;line-height:1.05;margin:6px 0 10px;letter-spacing:-.02em}
 .tm-main.warn .tm-time{color:var(--gold)}
-.tm-main.res .tm-time{color:#e8893a}.tm-main.res .tm-bar i{background:#e8893a}
-.tm-res2{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px auto 0;background:var(--bg);border-radius:12px;padding:8px 14px;width:max-content;max-width:100%;font-size:14px;color:var(--muted)}
-.tm-res2 b{font-size:20px;color:var(--text);font-variant-numeric:tabular-nums}
-.tm-res2 small{font-size:12px}
-.tm-res2.on{background:rgba(232,137,58,.18);color:#e8893a}.tm-res2.on b{color:#e8893a}
-.tm-res2.empty b{color:var(--accent)}
+.tm-duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 2px}
+.tm-box{background:var(--bg);border-radius:14px;padding:10px 8px 9px;border:2px solid transparent;display:flex;flex-direction:column;gap:6px;transition:opacity .2s}
+.tm-box small{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.tm-box em{font-style:normal;font-size:12px;color:var(--muted)}
+.tm-num{font-size:46px;font-weight:850;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.02em}
+.tm-box.act{border-color:var(--tc)}
+.tm-box.done{opacity:.4}
+.tm-box.cr:not(.act){opacity:.55}
+.tm-box.cr:not(.act) .tm-bar i{background:var(--muted)}
+.tm-box.cr.act{border-color:#e8893a;background:rgba(232,137,58,.12);opacity:1}
+.tm-box.cr.act .tm-num,.tm-box.cr.act small,.tm-box.cr.act em{color:#e8893a}
+.tm-box.cr .tm-bar i{background:#e8893a}
+.tm-box.cr.zero{opacity:.35}
+.tm-main.warn .tm-box.act:not(.cr) .tm-num{color:var(--gold)}
+.tm-box.over{border-color:var(--accent)}.tm-box.over .tm-num{color:var(--accent)}
+.tm-main.res .tm-time{color:#e8893a}
 .pill.res #pTime{color:#e8893a}.stimer.res b{color:#e8893a}
 .pill #pTime small{font-size:14px;color:var(--muted);font-weight:700}
 .stimer span{color:var(--muted)}
@@ -260,10 +270,10 @@ body.has-pill{padding-bottom:calc(140px + var(--safe-b))}
   <button data-tab="match"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M10 3h4M12 3v3M18.5 6.5l1.5-1.5"/></svg>Match</button>
 </nav>
 
-<script src="data-skills.js?v=16"></script>
-<script src="data-rules.js?v=16"></script>
-<script src="data-teams.js?v=16"></script>
-<script src="app.js?v=16"></script>
-<script src="timer.js?v=16"></script>
+<script src="data-skills.js?v=17"></script>
+<script src="data-rules.js?v=17"></script>
+<script src="data-teams.js?v=17"></script>
+<script src="app.js?v=17"></script>
+<script src="timer.js?v=17"></script>
 </body>
 </html>

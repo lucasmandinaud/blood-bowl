@@ -135,8 +135,8 @@ function setupView(){
         stepper("setupMin", "Réserve hors tours", cfg.setupMin + " min", "Coups d'envoi, mises en place, mi-temps")
       : stepper("turnMin", "Durée d'un tour", String(cfg.turnMin).replace(".", ",") + " min")}
     <div class="tm-res">${res}</div>
-    <button class="tm-tog${cfg.carry?" on":""}" data-tt="carry"><span><b>Réserve de temps</b><small>Le temps non utilisé (tour rapide, turnover) est mis de côté. Il ne sert que si un tour dépasse son temps de base.</small></span><i></i></button>
-    ${cfg.carry ? stepper("cap", "Plafond de la réserve", cfg.cap ? fmt(cfg.cap * b) : "Aucun", cfg.cap ? `${cfg.cap} tour${cfg.cap > 1 ? "s" : ""} de base` : "La réserve peut grossir sans limite") : ""}
+    <button class="tm-tog${cfg.carry?" on":""}" data-tt="carry"><span><b>Crédit de temps</b><small>Le temps non utilisé (tour rapide, turnover) est mis de côté. Il ne se décompte que quand le temps du tour est écoulé.</small></span><i></i></button>
+    ${cfg.carry ? stepper("cap", "Plafond du crédit", cfg.cap ? fmt(cfg.cap * b) : "Aucun", cfg.cap ? `${cfg.cap} tour${cfg.cap > 1 ? "s" : ""} de base` : "Le crédit peut grossir sans limite") : ""}
   </div>
   <h2 class="group">🏈 Coachs</h2>
   <div class="card tm-card">
@@ -149,7 +149,7 @@ function setupView(){
 }
 function scoreCards(){
   return `<div class="tm-score">${[0,1].map(i => `<div style="border-color:${COL[i]}"><b><i style="background:${COL[i]}"></i>${esc(cfg.names[i])}</b>
-    ${st.carry ? `<span>Réserve <em id="tmBank${i}">${fmt(st.bank[i])}</em></span>` : ""}
+    ${st.carry ? `<span>Crédit <em id="tmBank${i}">${fmt(st.bank[i])}</em></span>` : ""}
     <span>Temps joué <em>${fmtLong(st.used[i])}</em></span>
     <span>Dépassements <em class="${st.over[i] ? "red" : ""}">${st.over[i] ? fmt(st.over[i]).replace("+","") : "0:00"}</em></span></div>`).join("")}</div>`;
 }
@@ -158,10 +158,11 @@ function runView(){
   return `<h2 class="group">⏱️ ${st.half === 1 ? "1re" : "2e"} mi-temps · Tour ${turn}/${TURNS}</h2>
   <div class="tm-main" id="tmMain" style="--tc:${COL[w]}">
     <div class="tm-who"><i></i>${esc(cfg.names[w])}${paused ? ` <span class="tm-p">EN PAUSE</span>` : ""}</div>
-    <div class="tm-time" id="tmTime">${fmt(remaining())}</div>
-    <div class="tm-bar"><i id="tmBar"></i></div>
+    ${st.carry ? `<div class="tm-duo">
+      <div class="tm-box" id="tmBoxT"><small>Votre tour</small><div class="tm-num" id="tmTime"></div><div class="tm-bar"><i id="tmBar"></i></div><em id="tmCapT"></em></div>
+      <div class="tm-box cr" id="tmBoxC"><small>🔋 Crédit</small><div class="tm-num" id="tmCred"></div><div class="tm-bar"><i id="tmBarC"></i></div><em id="tmCapC"></em></div>
+    </div>` : `<div class="tm-time" id="tmTime"></div><div class="tm-bar"><i id="tmBar"></i></div>`}
     <div class="tm-info" id="tmInfo"></div>
-    ${st.carry ? `<div class="tm-res2" id="tmRes"></div>` : ""}
   </div>
   <button class="tm-big" data-ta="end">Fin du tour ⏭</button>
   <div class="tm-row">
@@ -205,7 +206,7 @@ function tick(){
   // Temps de base d'abord, puis la réserve fond, puis dépassement
   const baseRem = st.base - elapsed(), bank = st.carry ? st.bank[w] : 0;
   const inRes = baseRem <= 0 && rem > 0 && bank > 0;
-  const resNow = inRes ? rem : bank;
+  const resNow = inRes ? rem : baseRem > 0 ? bank : 0;
   const shown = baseRem > 0 ? baseRem : rem;
   const txt = fmt(shown);
   const state = rem <= 0 ? "over" : inRes ? "res" : (rem < 30000 ? "warn" : "");
@@ -218,22 +219,33 @@ function tick(){
   // Pastille flottante
   pill.style.setProperty("--tc", COL[w]);
   pill.className = "pill " + (showPill ? "on " : "") + state + (st.phase === "paused" ? " paused" : "");
-  $("#pName").textContent = cfg.names[w] + " · T" + (Math.floor(st.idx/2)+1) + (st.phase === "paused" ? " · pause" : inRes ? " · réserve" : "");
+  $("#pName").textContent = cfg.names[w] + " · T" + (Math.floor(st.idx/2)+1) + (st.phase === "paused" ? " · pause" : inRes ? " · crédit" : "");
   $("#pTime").innerHTML = esc(txt) + (st.carry && (bank || inRes) && baseRem > 0 ? ` <small>+ ${fmt(resNow)}</small>` : "");
   $("#pPause").textContent = st.phase === "paused" ? "▶" : "⏸";
   // Rappel dans les fiches
   sT.style.setProperty("--tc", COL[w]);
   sT.className = "stimer on " + state;
-  sT.innerHTML = `<i></i>${esc(cfg.names[w])} · <b>${txt}</b>${inRes ? " · réserve" : st.carry && bank && baseRem > 0 ? ` <span>+ ${fmt(bank)}</span>` : ""}`;
+  sT.innerHTML = `<i></i>${esc(cfg.names[w])} · <b>${txt}</b>${inRes ? " · crédit" : st.carry && bank && baseRem > 0 ? ` <span>+ ${fmt(bank)}</span>` : ""}`;
   // Vue Match
   const t = $("#tmTime"); if (!t) return;
-  t.textContent = txt;
   $("#tmMain").className = "tm-main " + state;
-  $("#tmBar").style.width = Math.max(0, Math.min(100, (inRes ? rem / bank : baseRem / st.base) * 100)) + "%";
-  $("#tmInfo").textContent = rem <= 0 ? "Temps écoulé !" : inRes ? "Temps de base écoulé · la réserve est utilisée" : `Temps de base · ${fmt(st.base)}`;
+  const pct = x => Math.max(0, Math.min(100, x * 100)) + "%";
+  if (st.carry) {
+    const credit = Math.max(0, resNow);
+    t.textContent = baseRem > 0 ? fmt(baseRem) : rem <= 0 ? fmt(rem) : "0:00";
+    $("#tmBar").style.width = pct(baseRem / st.base);
+    $("#tmCapT").textContent = rem <= 0 ? "dépassement" : baseRem > 0 ? `sur ${fmt(st.base)}` : "écoulé";
+    $("#tmBoxT").className = "tm-box" + (baseRem > 0 ? " act" : rem <= 0 ? " act over" : " done");
+    $("#tmCred").textContent = fmt(credit);
+    $("#tmBarC").style.width = pct(st.cap ? credit / st.cap : bank ? credit / bank : 0);
+    $("#tmCapC").textContent = inRes ? "en cours" : rem <= 0 || !bank && baseRem <= 0 ? "épuisé" : st.cap ? `figé · max ${fmt(st.cap)}` : "figé";
+    $("#tmBoxC").className = "tm-box cr" + (inRes ? " act" : "") + (credit ? "" : " zero");
+  } else {
+    t.textContent = txt;
+    $("#tmBar").style.width = pct(rem / all);
+  }
+  $("#tmInfo").textContent = rem <= 0 ? "Temps écoulé !" : inRes ? "Temps du tour écoulé · le crédit est utilisé" : st.carry ? "Le crédit ne se décompte qu'une fois le temps du tour écoulé." : `sur ${fmt(all)}`;
   const bk = $("#tmBank" + w); if (bk) bk.textContent = fmt(Math.max(0, resNow));
-  const r = $("#tmRes");
-  if (r) { r.className = "tm-res2" + (inRes ? " on" : "") + (rem <= 0 ? " empty" : ""); r.innerHTML = `<span>🔋 Réserve</span><b>${fmt(Math.max(0, resNow))}</b>${st.cap ? `<small>max ${fmt(st.cap)}</small>` : ""}`; }
   // Fin estimée si chacun utilise tout son temps
   const left = 4 * TURNS - ((st.half - 1) * 2 * TURNS + st.idx) - 1;
   const eta = now() + Math.max(0, rem) + left * st.base + (st.carry ? st.bank[1 - w] : 0);
