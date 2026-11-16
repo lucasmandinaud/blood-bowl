@@ -15,6 +15,9 @@ try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) {
   // Nouveaux réglages par défaut (crédit décoché, sans plafond), appliqués une fois aux téléphones déjà configurés
   if (!s.cfg || s.cfg.v !== 2) { cfg.carry = false; cfg.cap = 0; cfg.v = 2; localStorage.setItem(KEY, JSON.stringify({cfg, st})); }
 } } catch(e){}
+// Les noms des coachs ne sont gardés que pendant un match (pour survivre à une fermeture de l'app) :
+// à l'ouverture, hors match en cours, on repart de « Coach 1 » / « Coach 2 ».
+if (st.phase === "setup") cfg.names = [...DEF_CFG.names];
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify({cfg, st})); } catch(e){} };
 
 // ---------- Calculs ----------
