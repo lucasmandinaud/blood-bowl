@@ -87,6 +87,8 @@ function endTurn(){
 }
 function undo(){
   if (!st.log || !st.log.length || st.log[st.log.length-1].w === -1) return;
+  const last = st.log[st.log.length-1];
+  if (!confirm(`Annuler la fin du tour de ${cfg.names[last.w]} ?\n\nLe chrono revient à son tour, avec le temps qu'il lui restait.`)) return;
   const l = st.log.pop();
   if (st.phase === "half" || st.phase === "done") { if (st.idx === 0) { st.half = 1; st.idx = 2 * TURNS; } st.phase = "running"; }
   st.idx--;
