@@ -191,10 +191,10 @@ function render(){
 }
 
 // Mise à jour légère, 4 fois par seconde
-let view = "skills";
 function tick(){
   const live = st.phase === "running" || st.phase === "paused";
   const pill = $("#pill"), sT = $("#sTimer");
+  const view = $("#v-match").classList.contains("on") ? "match" : "other";
   document.body.classList.toggle("has-pill", live && view !== "match");
   pill.classList.toggle("on", live && view !== "match");
   sT.classList.toggle("on", live);
@@ -230,7 +230,7 @@ function tick(){
 setInterval(tick, 250);
 
 // ---------- Évènements ----------
-document.addEventListener("bb:view", e => { view = e.detail; tick(); });
+document.addEventListener("bb:view", () => tick());
 document.addEventListener("click", e => {
   const a = e.target.closest("[data-ta]");
   if (a) { ({start, end:endTurn, pause, undo, half:secondHalf, reset})[a.dataset.ta](); return; }
