@@ -164,18 +164,17 @@ function runView(){
     <button data-ta="pause">${paused ? "▶ Reprendre" : "⏸ Pause"}</button>
     <button data-ta="undo"${st.log.length && st.log[st.log.length-1].w !== -1 ? "" : " disabled"}>↩ Annuler fin de tour</button>
   </div>
+  <div class="tm-row"><button class="tm-stop" data-ta="reset">⏹ Arrêter le match</button></div>
   ${scoreCards()}
-  <p class="pnote" id="tmEta"></p>
-  <button class="tm-link" data-ta="reset">Arrêter le match</button>`;
+  <p class="pnote" id="tmEta"></p>`;
 }
 function halfView(){
   const w = (st.first + 1) % 2;
   return `<h2 class="group">⏱️ Mi-temps</h2>
   <div class="card tm-card" style="text-align:center"><div style="font-size:40px">🍺</div><p><b>Fin de la 1re mi-temps.</b><br>${esc(cfg.names[w])} reçoit et joue en premier.</p></div>
   <button class="tm-big" data-ta="half">▶ Coup d'envoi 2e mi-temps</button>
-  <div class="tm-row"><button data-ta="undo">↩ Annuler fin de tour</button></div>
-  ${scoreCards()}
-  <button class="tm-link" data-ta="reset">Arrêter le match</button>`;
+  <div class="tm-row"><button data-ta="undo">↩ Annuler fin de tour</button><button class="tm-stop" data-ta="reset">⏹ Arrêter le match</button></div>
+  ${scoreCards()}`;
 }
 function doneView(){
   return `<h2 class="group">🏁 Fin du match</h2>
@@ -194,11 +193,10 @@ function render(){
 function tick(){
   const live = st.phase === "running" || st.phase === "paused";
   const pill = $("#pill"), sT = $("#sTimer");
-  const view = $("#v-match").classList.contains("on") ? "match" : "other";
-  document.body.classList.toggle("has-pill", live && view !== "match");
-  pill.classList.toggle("on", live && view !== "match");
+  const showPill = live && !$("#v-match").classList.contains("on");
+  document.body.classList.toggle("has-pill", showPill);
   sT.classList.toggle("on", live);
-  if (!live) return;
+  if (!live) { pill.className = "pill"; return; }
   const w = who(), rem = remaining(), all = allowance(), txt = fmt(rem);
   const state = rem < 0 ? "over" : rem < 30000 ? "warn" : "";
   // Alertes sonores : 30 s restantes, puis temps écoulé
@@ -208,7 +206,7 @@ function tick(){
   }
   // Pastille flottante
   pill.style.setProperty("--tc", COL[w]);
-  pill.className = "pill on " + state + (st.phase === "paused" ? " paused" : "");
+  pill.className = "pill " + (showPill ? "on " : "") + state + (st.phase === "paused" ? " paused" : "");
   $("#pName").textContent = cfg.names[w] + " · T" + (Math.floor(st.idx/2)+1) + (st.phase === "paused" ? " · pause" : "");
   $("#pTime").textContent = txt;
   $("#pPause").textContent = st.phase === "paused" ? "▶" : "⏸";
