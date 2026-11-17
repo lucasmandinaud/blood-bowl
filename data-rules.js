@@ -258,7 +258,26 @@ window.BB_TABLES = [
  ["6","Ah oui, présenté comme ça…","Pas Expulsé (Turnover quand même)."]]},
 {id:"temporiser",t:"Temporiser",dice:"D6",p:81,rows:[
  ["≥ n° du Tour","Projectile","Le porteur qui temporise est Plaqué (Turnover)."],
- ["< n° du Tour","Rien","Le public se contente de huer."]]}
+ ["< n° du Tour","Rien","Le public se contente de huer."]]},
+{id:"prieres",t:"Prières à Nuffle",dice:"D16",p:"?",rows:[
+ ["Règle","Comment ça marche","Coup de Pouce : 1 jet par Prière achetée. Résultat déjà obtenu : on relance. L'effet dure tout le match. Jamais sur un Star Player."],
+ ["1","Trappe traîtresse","Tout joueur (des deux équipes) qui entre sur une case Trappe lance un D6 : sur 1, il tombe dedans (Blessure comme s'il était Poussé dans le public). Le ballon rebondit depuis la Trappe."],
+ ["2","Copain avec l'arbitre","Quand vous Contestez la Décision, un 5 ou 6 compte comme « Ah oui, présenté comme ça… » ; 2-4 = « Je m'en fiche ! »."],
+ ["3","Stylet","Un de vos joueurs, tiré au hasard, gagne Poignard."],
+ ["4","Homme de fer","Un de vos joueurs, au choix, gagne +1 AR (maximum 11+)."],
+ ["5","Poing américain","Un de vos joueurs, au choix, gagne Châtaigne (+1)."],
+ ["6","Mauvaises habitudes","D3 joueurs adverses, tirés au hasard, gagnent Solitaire (2+)."],
+ ["7","Crampons graissés","Un joueur adverse, tiré au hasard, perd 1 M (minimum 1)."],
+ ["8","Statue bénie de Nuffle","Un de vos joueurs, tiré au hasard, gagne Pro."],
+ ["9 ✱","Taupes sous le terrain","Les joueurs adverses ont −1 pour Foncer."],
+ ["10 ✱","Passe parfaite","Vos Passes réussies rapportent 2 PSP au lieu de 1."],
+ ["11 ✱","Interaction avec les fans","Votre joueur qui réceptionne une Passe gagne 1 PSP."],
+ ["12 ✱","Violence nécessaire","Si un adversaire Poussé dans le public est Éliminé, votre joueur qui l'a poussé gagne 2 PSP."],
+ ["13 ✱","Frénésie d'agressions","Votre joueur qui Élimine un adversaire sur une Agression gagne 2 PSP (comme sur un Blocage)."],
+ ["14 ✱","Lancer de pierre","1 fois par match, au début de votre Tour (avant toute activation) : un joueur adverse sur le terrain tiré au hasard, D6 : sur 4+ il est Plaqué."],
+ ["15 ✱","Sous surveillance","Un adversaire qui casse l'armure sur une Agression est vu par l'arbitre, même sans double."],
+ ["16 ✱","Entraînement intensif","Un de vos joueurs, tiré au hasard, gagne 1 compétence Principale de votre choix."],
+ ["Tournoi","Version D8","✱ Résultats 9-16 non utilisés en tournoi : on lance un D8 (lignes 1 à 8)."]]}
 ];
 
 // Antisèche des modificateurs
@@ -287,5 +306,6 @@ window.BB_TABLE_EMOJI = {
  elimination:{e:"🚑",r:{"Commotion":"🤕","Amoché":"🩹","Blessure sérieuse":"🩼","Séquelle":"🦴","Mort":"⚰️"}},
  sequelle:{e:"🦴",r:{"Traumatisme crânien":"🧠","Genou déboîté":"🦵","Bras cassé":"💪","Hanche disloquée":"🦴","Cou brisé":"🦒"}},
  contester:{e:"⚖️",r:{"Dégagez !":"🟥","Je m'en fiche !":"🤷","Ah oui, présenté comme ça…":"👍"}},
- temporiser:{e:"⏳",r:{"Projectile":"🍅","Rien":"😒"}}
+ temporiser:{e:"⏳",r:{"Projectile":"🍅","Rien":"😒"}},
+ prieres:{e:"🙏",r:{"Comment ça marche":"📜","Trappe traîtresse":"🕳️","Copain avec l'arbitre":"🤝","Stylet":"🗡️","Homme de fer":"🛡️","Poing américain":"👊","Mauvaises habitudes":"🙄","Crampons graissés":"🧈","Statue bénie de Nuffle":"🗿","Taupes sous le terrain":"🐀","Passe parfaite":"🎯","Interaction avec les fans":"🙌","Violence nécessaire":"💥","Frénésie d'agressions":"🥾","Lancer de pierre":"🪨","Sous surveillance":"👀","Entraînement intensif":"🏋️","Version D8":"🏆"}}
 };
