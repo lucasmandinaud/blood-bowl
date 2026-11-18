@@ -21,7 +21,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
-body{min-height:100vh;padding-bottom:calc(72px + var(--safe-b))}
+body{min-height:100vh;padding-bottom:calc(80px + var(--safe-b))}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 
 /* Header */
@@ -147,13 +147,13 @@ mark{background:rgba(224,176,79,.3);color:inherit;border-radius:3px}
 
 /* Tab bar */
 nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:rgba(22,35,27,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:var(--safe-b)}
-nav button{flex:1;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:var(--muted);font-weight:600}
+nav button{flex:1;height:68px;line-height:1.15;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:var(--muted);font-weight:600}
 nav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8}
 nav button.on{color:var(--gold)}
 
 /* Chrono de match */
-body.has-pill{padding-bottom:calc(140px + var(--safe-b))}
-.pill{position:fixed;left:10px;right:10px;bottom:calc(60px + var(--safe-b) + 8px);z-index:32;display:none;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--line);border-left:5px solid var(--tc);border-radius:16px;padding:6px 6px 6px 12px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+body.has-pill{padding-bottom:calc(148px + var(--safe-b))}
+.pill{position:fixed;left:10px;right:10px;bottom:calc(68px + var(--safe-b) + 8px);z-index:32;display:none;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--line);border-left:5px solid var(--tc);border-radius:16px;padding:6px 6px 6px 12px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
 .pill.on{display:flex}
 .pill #pOpen{flex:1;min-width:0;text-align:left;display:flex;flex-direction:column}
 .pill #pName{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -272,15 +272,15 @@ body.has-pill{padding-bottom:calc(140px + var(--safe-b))}
   <button data-tab="skills" class="on"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Compétences</button>
   <button data-tab="rules"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>Règles</button>
   <button data-tab="tables"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3"/><circle cx="15" cy="15" r="1.3"/><circle cx="15" cy="9" r="1.3"/><circle cx="9" cy="15" r="1.3"/></svg>Tableaux</button>
-  <button data-tab="teams"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Équipes</button>
+  <button data-tab="teams"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Équipes &amp;<br>Star Players</span></button>
   <button data-tab="match"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M10 3h4M12 3v3M18.5 6.5l1.5-1.5"/></svg>Match</button>
 </nav>
 
-<script src="data-skills.js?v=23"></script>
-<script src="data-rules.js?v=23"></script>
-<script src="data-teams.js?v=23"></script>
-<script src="data-stars.js?v=23"></script>
-<script src="app.js?v=23"></script>
-<script src="timer.js?v=23"></script>
+<script src="data-skills.js?v=24"></script>
+<script src="data-rules.js?v=24"></script>
+<script src="data-teams.js?v=24"></script>
+<script src="data-stars.js?v=24"></script>
+<script src="app.js?v=24"></script>
+<script src="timer.js?v=24"></script>
 </body>
 </html>
