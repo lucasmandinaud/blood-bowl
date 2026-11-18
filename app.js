@@ -135,7 +135,9 @@ function rowTeam(t, sub){
   const emo = (window.BB_TEAM_EMOJI||{})[t.n] || "🏈";
   return `<button class="item" data-id="${t.id}"><span class="dot emo">${emo}</span><span class="main"><span class="name">${esc(t.n)}</span>${sub?`<span class="sub">${sub}</span>`:""}</span></button>`;
 }
-let teamSeg = "teams", starLg = "all";
+let teamSeg = "teams", starLg = "all", starTeam = "all", starRace = "all";
+const POSTES = ["Blitzeur","Bloqueur","Coureur","Lanceur","Receveur","Trois-quarts","Gros Bras","Spécial"];
+const starRaces = s => s.kw.split(/,\s*/).filter(k => !POSTES.includes(k));
 function renderTeams(){
   const seg = `<div class="seg"><button data-seg="teams"${teamSeg==="teams"?' class="on"':""}>Équipes</button><button data-seg="stars"${teamSeg==="stars"?' class="on"':""}>Star Players</button></div>`;
   let html;
@@ -143,16 +145,22 @@ function renderTeams(){
   else if (!ST.length) html = `<div class="empty">Les Star Players arrivent bientôt.</div>`;
   else {
     const all = [...new Set(TE.flatMap(teamLeagues))].sort((a,b)=>a.localeCompare(b,"fr"));
-    const list = ST.filter(s => starLg==="all" || (s.lg.includes("Toutes") ? !s.ex.includes(starLg) : s.lg.includes(starLg) || (starLg==="Clash du Chaos" && s.te.some(x=>/Khorne|Nurgle/.test(x))) || (starLg==="Bagarre des Terres Arides" && s.te.includes("Favoris de Hashut")))).sort((a,b)=>a.n.localeCompare(b.n,"fr"));
+    const races = [...new Set(ST.flatMap(starRaces))].sort((a,b)=>a.localeCompare(b,"fr"));
+    const team = TE.find(t => t.n === starTeam);
+    const list = ST.filter(s => (!team || starPlaysFor(s, team) !== false) && (starRace==="all" || starRaces(s).includes(starRace))).filter(s => starLg==="all" || (s.lg.includes("Toutes") ? !s.ex.includes(starLg) : s.lg.includes(starLg) || (starLg==="Clash du Chaos" && s.te.some(x=>/Khorne|Nurgle/.test(x))) || (starLg==="Bagarre des Terres Arides" && s.te.includes("Favoris de Hashut")))).sort((a,b)=>a.n.localeCompare(b.n,"fr"));
     html = `<details class="card sprules"><summary>ℹ️ Règles d'embauche</summary>
       <p>Un Star Player ne joue que pour une équipe de l'une des ligues de sa ligne « Joue pour ». S'il demande une règle « Favoris de… », l'équipe doit avoir cette règle (et ce dieu précis).</p>
       <p><b>En Ligue :</b> il s'embauche comme Coup de Pouce (p. 142). <b>Jeu Égal / Hors-concours :</b> sur le budget de sélection de l'équipe, avec des Points de Compétence (p. 112).</p>
       <p>Les paires (Grak & Crumbleberry, Dribl & Drull, jumeaux Swift) s'embauchent ensemble, pour le prix indiqué.</p>
       <div class="src">Résumé · livre de règles p. 194</div></details>
-      <div class="chips in">${[["all","Toutes ligues"],...all.map(l=>[l,l])].map(([k,v]) => `<button class="chip${starLg===k?" on":""}" data-slg="${esc(k)}">${esc(v)}</button>`).join("")}</div>
-      <div class="count">${list.length} Star Players${starLg==="all"?"":" · "+esc(starLg)}</div>` + list.map(s => rowStar(s)).join("");
+      <p class="flbl">Ligue</p><div class="chips in">${[["all","Toutes"],...all.map(l=>[l,l])].map(([k,v]) => `<button class="chip${starLg===k?" on":""}" data-slg="${esc(k)}">${esc(v)}</button>`).join("")}</div>
+      <p class="flbl">Équipe</p><div class="chips in">${[["all","Toutes"],...TE.map(t=>[t.n,((window.BB_TEAM_EMOJI||{})[t.n]?(window.BB_TEAM_EMOJI||{})[t.n]+" ":"")+t.n])].map(([k,v]) => `<button class="chip${starTeam===k?" on":""}" data-steam="${esc(k)}">${esc(v)}</button>`).join("")}</div>
+      <p class="flbl">Race</p><div class="chips in">${[["all","Toutes"],...races.map(r=>[r,r])].map(([k,v]) => `<button class="chip${starRace===k?" on":""}" data-srace="${esc(k)}">${esc(v)}</button>`).join("")}</div>
+      <div class="count">${list.length} Star Player${list.length>1?"s":""}${[starLg,starTeam,starRace].filter(x=>x!=="all").map(x=>" · "+esc(x)).join("")}${(starLg+starTeam+starRace)!=="allallall" ? ` · <a class="x" data-sreset="1">tout afficher</a>` : ""}</div>` + (list.length ? list.map(s => team ? rowStar(s, starPlaysFor(s, team) ? esc(starPlaysFor(s, team)) : undefined) : rowStar(s)).join("") : `<div class="empty">Aucun Star Player avec ces filtres.</div>`);
   }
   $("#v-teams").innerHTML = seg + html;
+  // garde la puce sélectionnée visible dans chaque rangée de filtres
+  document.querySelectorAll("#v-teams .chips").forEach(row => { const on = row.querySelector(".chip.on"); if (on) row.scrollLeft = on.offsetLeft - row.offsetLeft - 16; });
 }
 // ---------- Star Players ----------
 const teamLeagues = t => t.lg.split(/\s+ou\s+/);
@@ -320,6 +328,11 @@ document.addEventListener("click", e => {
   if (g) { teamSeg = g.dataset.seg; renderTeams(); window.scrollTo(0,0); return; }
   const sl = e.target.closest("[data-slg]");
   if (sl) { starLg = sl.dataset.slg; renderTeams(); return; }
+  const stm = e.target.closest("[data-steam]");
+  if (stm) { starTeam = stm.dataset.steam; renderTeams(); return; }
+  const sra = e.target.closest("[data-srace]");
+  if (sra) { starRace = sra.dataset.srace; renderTeams(); return; }
+  if (e.target.closest("[data-sreset]")) { starLg = starTeam = starRace = "all"; renderTeams(); return; }
   const c = e.target.closest("[data-cat]");
   if (c) { cat = c.dataset.cat; renderChips(); renderSkills(); window.scrollTo(0,0); return; }
   const n = e.target.closest("nav button");
