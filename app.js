@@ -347,5 +347,11 @@ $("#sheet").addEventListener("touchend", e => { if (y0===null) return; const dy 
 
 renderChips(); renderSkills(); renderRules(); renderTables(); renderTeams(); show("skills");
 
-if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  // Quand une nouvelle version s'installe, on recharge une fois pour l'afficher tout de suite
+  const had = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (had && !reloaded) { reloaded = true; location.reload(); } });
+  navigator.serviceWorker.register("sw.js", {updateViaCache: "none"}).then(r => r.update()).catch(()=>{});
+}
 })();
