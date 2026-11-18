@@ -13,7 +13,7 @@ TB.forEach(t => { const m = TEMO[t.id] || {}; t.e = m.e || "🎲"; t.re = m.r ||
 const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-");
 TE.forEach(t => { t.kind = "team"; t.id = "e-" + slug(t.n); });
 Object.entries(TR).forEach(([k,v]) => { const r = {kind:"trule", id:"x-"+slug(k), t:k, d:v}; TR[k] = r; });
-ST.forEach(s => { s.kind = "star"; s.id = "p-" + slug(s.n); s.lg = s.lg || []; s.te = s.te || []; });
+ST.forEach(s => { s.kind = "star"; s.id = "p-" + slug(s.n); s.lg = s.lg || []; s.te = s.te || []; s.ex = s.ex || []; });
 const BY = {}; [...SK,...RU,...TB,...TE,...Object.values(TR),...ST].forEach(x => BY[x.id] = x);
 // Associe "Solitaire (4+)" → Solitaire (X+), "Haine (Troll)" → Haine (X), etc.
 const skKey = s => norm(s.replace(/\(.*?\)/g,"")).replace(/[^a-z]/g,"");
@@ -135,35 +135,60 @@ function rowTeam(t, sub){
   const emo = (window.BB_TEAM_EMOJI||{})[t.n] || "🏈";
   return `<button class="item" data-id="${t.id}"><span class="dot emo">${emo}</span><span class="main"><span class="name">${esc(t.n)}</span>${sub?`<span class="sub">${sub}</span>`:""}</span></button>`;
 }
-let teamSeg = "teams";
+let teamSeg = "teams", starLg = "all";
 function renderTeams(){
   const seg = `<div class="seg"><button data-seg="teams"${teamSeg==="teams"?' class="on"':""}>Équipes</button><button data-seg="stars"${teamSeg==="stars"?' class="on"':""}>Star Players</button></div>`;
   let html;
   if (teamSeg === "teams") html = `<div class="count">${TE.length} équipes · touchez pour voir les joueurs</div>` + TE.map(t => rowTeam(t)).join("");
   else if (!ST.length) html = `<div class="empty">Les Star Players arrivent bientôt.</div>`;
   else {
-    const list = [...ST].sort((a,b)=>a.n.localeCompare(b.n,"fr"));
-    html = `<div class="count">${list.length} Star Players · touchez pour voir la fiche</div>` + list.map(s => rowStar(s)).join("");
+    const all = [...new Set(TE.flatMap(teamLeagues))].sort((a,b)=>a.localeCompare(b,"fr"));
+    const list = ST.filter(s => starLg==="all" || (s.lg.includes("Toutes") ? !s.ex.includes(starLg) : s.lg.includes(starLg) || (starLg==="Clash du Chaos" && s.te.some(x=>/Khorne|Nurgle/.test(x))) || (starLg==="Bagarre des Terres Arides" && s.te.includes("Favoris de Hashut")))).sort((a,b)=>a.n.localeCompare(b.n,"fr"));
+    html = `<details class="card sprules"><summary>ℹ️ Règles d'embauche</summary>
+      <p>Un Star Player ne joue que pour une équipe de l'une des ligues de sa ligne « Joue pour ». S'il demande une règle « Favoris de… », l'équipe doit avoir cette règle (et ce dieu précis).</p>
+      <p><b>En Ligue :</b> il s'embauche comme Coup de Pouce (p. 142). <b>Jeu Égal / Hors-concours :</b> sur le budget de sélection de l'équipe, avec des Points de Compétence (p. 112).</p>
+      <p>Les paires (Grak & Crumbleberry, Dribl & Drull, jumeaux Swift) s'embauchent ensemble, pour le prix indiqué.</p>
+      <div class="src">Résumé · livre de règles p. 194</div></details>
+      <div class="chips in">${[["all","Toutes ligues"],...all.map(l=>[l,l])].map(([k,v]) => `<button class="chip${starLg===k?" on":""}" data-slg="${esc(k)}">${esc(v)}</button>`).join("")}</div>
+      <div class="count">${list.length} Star Players${starLg==="all"?"":" · "+esc(starLg)}</div>` + list.map(s => rowStar(s)).join("");
   }
   $("#v-teams").innerHTML = seg + html;
 }
 // ---------- Star Players ----------
 const teamLeagues = t => t.lg.split(/\s+ou\s+/);
-const starPlaysFor = (s, t) => s.lg.includes("Toutes") || s.te.includes(t.n) || teamLeagues(t).some(l => s.lg.includes(l));
-const starWho = s => [...s.lg, ...s.te].join(" · ");
+// Renvoie false si le Star Player ne peut pas jouer pour l'équipe, "" s'il peut, ou une condition ("si …")
+function starPlaysFor(s, t){
+  const lgs = teamLeagues(t);
+  if (s.lg.includes("Toutes")) return lgs.every(l => s.ex.includes(l)) ? false : (lgs.some(l => s.ex.includes(l)) ? "sauf en " + s.ex.join(", ") : "");
+  const conds = [];
+  if (lgs.some(l => s.lg.includes(l))) conds.push(lgs.every(l => s.lg.includes(l)) ? "" : "si " + lgs.filter(l => s.lg.includes(l)).join(" ou "));
+  for (const req of s.te) {
+    const god = norm(req.replace(/^Favoris de\s*/,""));
+    const r = t.sr.find(x => norm(x).startsWith("favoris de") && (norm(x).includes(god) || (norm(x).includes("au choix") && god !== "hashut")));
+    if (r) conds.push(norm(r) === norm(req) ? "" : "si " + req);
+  }
+  if (!conds.length) return false;
+  return conds.includes("") ? "" : conds.join(" ou ").replace(/ ou si /g, " ou ");
+}
+const starWho = s => s.lg.includes("Toutes") ? "Toute équipe" + (s.ex.length ? " sauf " + s.ex.join(", ") : "") : [...s.lg, ...s.te].join(" · ");
+const starCost = s => s.pair ? `${fmtK(s.c)} les deux` : fmtK(s.c);
 function rowStar(s, sub){
-  return `<button class="item" data-id="${s.id}"><span class="dot emo">⭐</span><span class="main"><span class="name">${esc(s.n)}</span><span class="sub">${sub || esc(starWho(s))}</span></span><span class="tags"><span class="tag">${fmtK(s.c)}</span></span></button>`;
+  return `<button class="item" data-id="${s.id}"><span class="dot emo">⭐</span><span class="main"><span class="name">${esc(s.n)}</span><span class="sub">${sub || esc(starWho(s))}</span></span><span class="tags"><span class="tag">${starCost(s)}</span></span></button>`;
 }
 function starBody(s){
   return `<div class="pl"><div class="st"><div><small>M</small>${s.M}</div><div><small>F</small>${s.F}</div><div><small>AG</small>${s.AG}</div><div><small>CP</small>${s.CP}</div><div><small>AR</small>${s.AR}</div></div>
   <div class="sks">${skillChips(s.sk)}</div></div>
+  ${s.pair ? `<p class="note">👥 S'embauche obligatoirement avec <a class="x" data-id="p-${slug(s.pair)}">${esc(s.pair)}</a> : ${s.c} 000 po pour les deux.</p>` : ""}
+  ${s.nt ? `<p class="note">⚠️ ${esc(s.nt)}</p>` : ""}
   ${s.sr ? `<p class="lbl">⭐ ${esc(s.sr.t)}</p><p>${linkify(s.sr.d)}</p>` : ""}
   <p class="lbl">Joue pour</p><p>${esc(starWho(s))}</p>
-  <div class="src">${s.src==="pdf" ? "Résumé · PDF Star Players 3e Saison" : "Résumé · livre de règles p. " + s.p}</div>`;
+  <p class="lbl">Mots-clés</p><p>${esc(s.kw)}</p>
+  <div class="src">${s.src==="pdf" ? "Résumé · PDF Star Players 3e Saison" : "Résumé · livre de règles p. " + s.p}${s.faq ? " · mis à jour FAQ mai 2026" : ""}</div>`;
 }
 function skillChips(str){
   if (str === "—") return `<span class="none">Aucune</span>`;
-  return str.split(/,\s*/).map(s => { const id = SKMAP[skKey(s)]; return id ? `<a class="sk" data-id="${id}">${esc(s)}</a>` : `<span class="sk off">${esc(s)}</span>`; }).join("");
+  const one = s => { const id = SKMAP[skKey(s)]; return id ? `<a class="sk" data-id="${id}">${esc(s)}</a>` : `<span class="sk off">${esc(s)}</span>`; };
+  return str.split(/,\s*/).map(s => s.includes(" ou ") ? `<span class="skor">${s.split(" ou ").map(one).join("<i>ou</i>")}</span>` : one(s)).join("");
 }
 function playerCard(p){
   const [q,n,kw,cost,M,F,AG,CP,AR,sk,pr,se] = p;
@@ -180,7 +205,7 @@ function teamBody(t){
   <p class="lbl">Règles spéciales</p><div class="sks">${rules}</div>
   ${t.bigNote?`<p class="note">${esc(t.bigNote)}</p>`:""}
   <p class="lbl">Joueurs</p>${t.pl.map(playerCard).join("")}
-  ${(() => { const ss = ST.filter(s => starPlaysFor(s, t)).sort((a,b)=>a.n.localeCompare(b.n,"fr")); return ss.length ? `<p class="lbl">Star Players disponibles · ${ss.length}</p>` + ss.map(s => rowStar(s, `${fmtK(s.c)} po · ${esc(s.sk.split(/,\s*/).slice(0,3).join(", "))}…`)).join("") : ""; })()}
+  ${(() => { const ss = ST.map(s => [s, starPlaysFor(s, t)]).filter(([,c]) => c !== false).sort((a,b)=>a[0].n.localeCompare(b[0].n,"fr")); return ss.length ? `<p class="lbl">Star Players disponibles · ${ss.length}</p>` + ss.map(([s,c]) => rowStar(s, c ? esc(c) : `M${s.M} F${s.F} AG${s.AG} CP${s.CP} AR${s.AR}`)).join("") : ""; })()}
   <p class="note">Compétences : A Agilité · F Force · G Générale · M Mutation · P Passe · S Scélérate.</p>
   <div class="src">Fiche d'équipe · livre de règles p. ${t.p}</div>`;
 }
@@ -252,7 +277,7 @@ function render(){
   } else if (x.kind === "star") {
     $("#sDot").outerHTML = `<div class="dot emo" id="sDot">⭐</div>`;
     $("#sTitle").textContent = x.n;
-    $("#sMeta").textContent = `Star Player · ${x.c} 000 po`;
+    $("#sMeta").textContent = `Star Player · ${x.c} 000 po${x.pair ? " les deux" : ""}`;
     $("#sBody").innerHTML = starBody(x);
   } else if (x.kind === "trule") {
     $("#sDot").outerHTML = `<div class="dot" id="sDot" style="background:var(--surface2);color:var(--gold)">★</div>`;
@@ -293,6 +318,8 @@ document.addEventListener("click", e => {
   if (a) { e.preventDefault(); open(a.dataset.id); return; }
   const g = e.target.closest("[data-seg]");
   if (g) { teamSeg = g.dataset.seg; renderTeams(); window.scrollTo(0,0); return; }
+  const sl = e.target.closest("[data-slg]");
+  if (sl) { starLg = sl.dataset.slg; renderTeams(); return; }
   const c = e.target.closest("[data-cat]");
   if (c) { cat = c.dataset.cat; renderChips(); renderSkills(); window.scrollTo(0,0); return; }
   const n = e.target.closest("nav button");
