@@ -157,7 +157,7 @@ function renderTeams(){
       <div class="src">Résumé · livre de règles p. 194</div></details>
       <p class="flbl">Ligue</p><div class="chips in">${[["all","Toutes"],...all.map(l=>[l,l])].map(([k,v]) => `<button class="chip${starLg===k?" on":""}" data-slg="${esc(k)}">${esc(v)}</button>`).join("")}</div>
       <p class="flbl">Équipe</p><div class="chips in">${[["all","Toutes"],...TE.map(t=>[t.n,((window.BB_TEAM_EMOJI||{})[t.n]?(window.BB_TEAM_EMOJI||{})[t.n]+" ":"")+t.n])].map(([k,v]) => `<button class="chip${starTeam===k?" on":""}" data-steam="${esc(k)}">${esc(v)}</button>`).join("")}</div>
-      <div class="sortbar"><span class="flbl">Trier</span><button class="chip${starSort==="n"?" on":""}" data-ssort="n">Nom ${starSort==="n" && starDir<0 ? "Z→A" : "A→Z"}</button><button class="chip${starSort==="c"?" on":""}" data-ssort="c">Prix ${starSort==="c" && starDir<0 ? "décroissant ↓" : "croissant ↑"}</button></div>
+      <p class="flbl">Trier</p><div class="chips in"><button class="chip${starSort==="n"?" on":""}" data-ssort="n">Nom ${starSort==="n" && starDir<0 ? "Z→A" : "A→Z"}</button><button class="chip${starSort==="c"?" on":""}" data-ssort="c">Prix ${starSort==="c" && starDir<0 ? "décroissant ↓" : "croissant ↑"}</button></div>
       <div class="count">${list.length} Star Player${list.length>1?"s":""}${[starLg,starTeam].filter(x=>x!=="all").map(x=>" · "+esc(x)).join("")}${(starLg+starTeam)!=="allall" ? ` · <a class="x" data-sreset="1">tout afficher</a>` : ""}</div>` + (list.length ? list.map(s => team ? rowStar(s, starPlaysFor(s, team) ? esc(starPlaysFor(s, team)) : undefined) : rowStar(s)).join("") : `<div class="empty">Aucun Star Player avec ces filtres.</div>`);
   }
   $("#v-teams").innerHTML = seg + html;
