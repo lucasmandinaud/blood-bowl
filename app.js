@@ -58,14 +58,19 @@ function highlight(html, q){
 }
 
 // ---------- Vues ----------
-let cat = "all";
+let cat = "all", act = "all";
 function renderChips(){
   const list = [["all","Tout"],...Object.entries(CATS)];
   $("#chips").innerHTML = list.map(([k,v]) => `<button class="chip${cat===k?" on":""}" data-cat="${k}">${k!=="all"?`<i style="background:var(--c${k})"></i>`:""}${v}${k==="T"?"s":""}</button>`).join("");
+  $("#achips").innerHTML = [["all","Actifs et passifs"],["a","Actifs"],["p","Passifs"]].map(([k,v]) => `<button class="chip${act===k?" on":""}" data-act="${k}">${v}</button>`).join("");
 }
 function renderSkills(){
-  const list = SK.filter(s => cat==="all" || s.cat===cat).sort((a,b)=>a.n.localeCompare(b.n,"fr"));
-  let html = `<div class="count">${list.length} ${cat==="T"?"traits":cat==="all"?"compétences et traits":"compétences"}</div>`, L = "";
+  const list = SK.filter(s => (cat==="all" || s.cat===cat) && (act==="all" || s.act===(act==="a"))).sort((a,b)=>a.n.localeCompare(b.n,"fr"));
+  const fem = cat!=="all" && cat!=="T";
+  const adj = act==="all" ? "" : " " + (act==="a" ? (fem ? "actives" : "actifs") : (fem ? "passives" : "passifs"));
+  let lbl = (cat==="T"?"traits":cat==="all"?"compétences et traits":"compétences") + adj;
+  if (list.length < 2) lbl = lbl.replace(/s\b/g, "");
+  let html = `<div class="count">${list.length} ${lbl}${act!=="all" ? ` · <a class="x" data-act="all">tout afficher</a>` : ""}</div>`, L = "";
   list.forEach(s => { const l = norm(s.n[0]).toUpperCase(); if (l !== L) { L = l; html += `<div class="letter">${l}</div>`; } html += rowSkill(s); });
   $("#v-skills").innerHTML = html;
 }
@@ -312,6 +317,7 @@ function show(t){
   const view = q ? "search" : t;
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.id==="v-"+view));
   $("#chips").classList.toggle("off", !!q || t!=="skills");
+  $("#achips").classList.toggle("off", !!q || t!=="skills");
   document.dispatchEvent(new CustomEvent("bb:view", {detail: view}));
   setHH();
 }
@@ -332,6 +338,8 @@ document.addEventListener("click", e => {
   if (e.target.closest("[data-sreset]")) { starLg = starTeam = "all"; renderTeams(); return; }
   const c = e.target.closest("[data-cat]");
   if (c) { cat = c.dataset.cat; renderChips(); renderSkills(); window.scrollTo(0,0); return; }
+  const ac = e.target.closest("[data-act]");
+  if (ac) { act = ac.dataset.act; renderChips(); renderSkills(); window.scrollTo(0,0); return; }
   const n = e.target.closest("nav button");
   if (n) { if ($("#q").value) { $("#q").value=""; $("#searchBox").classList.remove("has"); } show(n.dataset.tab); window.scrollTo(0,0); }
 });

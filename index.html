@@ -45,6 +45,7 @@ header{position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 85%
 .chip{flex:none;height:32px;padding:0 13px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .chip i{width:8px;height:8px;border-radius:4px;display:inline-block}
 .chips.in{margin:0 -16px 4px}
+.chips.sub2{padding-top:8px}
 .sortbar{display:flex;align-items:center;gap:8px;margin:10px 0 2px}.sortbar .flbl{margin:0 4px 0 0}
 .flbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:8px 0 2px}
 .skor{display:inline-flex;align-items:center;gap:6px}.skor i{font-style:normal;color:var(--muted);font-size:13px}
@@ -72,6 +73,7 @@ main{padding:0 16px}
 .star{color:var(--gold);font-size:14px}
 h2.group{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:18px 2px 8px;font-weight:800}
 .count{color:var(--muted);font-size:13px;margin:4px 2px 8px}
+.count a.x{color:var(--gold);text-decoration:none;border-bottom:1px dotted var(--gold);cursor:pointer}
 .empty{color:var(--muted);text-align:center;padding:40px 20px}
 
 /* Tables */
@@ -245,6 +247,7 @@ body.has-pill{padding-bottom:calc(148px + var(--safe-b))}
     <button class="clear" id="clear" aria-label="Effacer">×</button>
   </div>
   <div class="chips" id="chips"></div>
+  <div class="chips sub2" id="achips"></div>
 </header>
 
 <main>
