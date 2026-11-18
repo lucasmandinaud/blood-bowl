@@ -1,5 +1,5 @@
 (() => {
-const SK = window.BB_SKILLS, RU = window.BB_RULES, TB = window.BB_TABLES, MO = window.BB_MODS, TE = window.BB_TEAMS, TR = window.BB_TEAM_RULES;
+const SK = window.BB_SKILLS, RU = window.BB_RULES, TB = window.BB_TABLES, MO = window.BB_MODS, TE = window.BB_TEAMS, TR = window.BB_TEAM_RULES, ST = window.BB_STARS || [];
 const CATS = {A:"Agilité",F:"Force",G:"Générale",M:"Mutation",P:"Passe",S:"Scélérate",T:"Trait"};
 const $ = s => document.querySelector(s);
 const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
@@ -13,7 +13,8 @@ TB.forEach(t => { const m = TEMO[t.id] || {}; t.e = m.e || "🎲"; t.re = m.r ||
 const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-");
 TE.forEach(t => { t.kind = "team"; t.id = "e-" + slug(t.n); });
 Object.entries(TR).forEach(([k,v]) => { const r = {kind:"trule", id:"x-"+slug(k), t:k, d:v}; TR[k] = r; });
-const BY = {}; [...SK,...RU,...TB,...TE,...Object.values(TR)].forEach(x => BY[x.id] = x);
+ST.forEach(s => { s.kind = "star"; s.id = "p-" + slug(s.n); s.lg = s.lg || []; s.te = s.te || []; });
+const BY = {}; [...SK,...RU,...TB,...TE,...Object.values(TR),...ST].forEach(x => BY[x.id] = x);
 // Associe "Solitaire (4+)" → Solitaire (X+), "Haine (Troll)" → Haine (X), etc.
 const skKey = s => norm(s.replace(/\(.*?\)/g,"")).replace(/[^a-z]/g,"");
 const SKMAP = {}; SK.forEach(s => SKMAP[skKey(s.n)] = s.id);
@@ -134,8 +135,31 @@ function rowTeam(t, sub){
   const emo = (window.BB_TEAM_EMOJI||{})[t.n] || "🏈";
   return `<button class="item" data-id="${t.id}"><span class="dot emo">${emo}</span><span class="main"><span class="name">${esc(t.n)}</span>${sub?`<span class="sub">${sub}</span>`:""}</span></button>`;
 }
+let teamSeg = "teams";
 function renderTeams(){
-  $("#v-teams").innerHTML = `<div class="count">${TE.length} équipes · touchez pour voir les joueurs</div>` + TE.map(t => rowTeam(t)).join("");
+  const seg = `<div class="seg"><button data-seg="teams"${teamSeg==="teams"?' class="on"':""}>Équipes</button><button data-seg="stars"${teamSeg==="stars"?' class="on"':""}>Star Players</button></div>`;
+  let html;
+  if (teamSeg === "teams") html = `<div class="count">${TE.length} équipes · touchez pour voir les joueurs</div>` + TE.map(t => rowTeam(t)).join("");
+  else if (!ST.length) html = `<div class="empty">Les Star Players arrivent bientôt.</div>`;
+  else {
+    const list = [...ST].sort((a,b)=>a.n.localeCompare(b.n,"fr"));
+    html = `<div class="count">${list.length} Star Players · touchez pour voir la fiche</div>` + list.map(s => rowStar(s)).join("");
+  }
+  $("#v-teams").innerHTML = seg + html;
+}
+// ---------- Star Players ----------
+const teamLeagues = t => t.lg.split(/\s+ou\s+/);
+const starPlaysFor = (s, t) => s.lg.includes("Toutes") || s.te.includes(t.n) || teamLeagues(t).some(l => s.lg.includes(l));
+const starWho = s => [...s.lg, ...s.te].join(" · ");
+function rowStar(s, sub){
+  return `<button class="item" data-id="${s.id}"><span class="dot emo">⭐</span><span class="main"><span class="name">${esc(s.n)}</span><span class="sub">${sub || esc(starWho(s))}</span></span><span class="tags"><span class="tag">${fmtK(s.c)}</span></span></button>`;
+}
+function starBody(s){
+  return `<div class="pl"><div class="st"><div><small>M</small>${s.M}</div><div><small>F</small>${s.F}</div><div><small>AG</small>${s.AG}</div><div><small>CP</small>${s.CP}</div><div><small>AR</small>${s.AR}</div></div>
+  <div class="sks">${skillChips(s.sk)}</div></div>
+  ${s.sr ? `<p class="lbl">⭐ ${esc(s.sr.t)}</p><p>${linkify(s.sr.d)}</p>` : ""}
+  <p class="lbl">Joue pour</p><p>${esc(starWho(s))}</p>
+  <div class="src">${s.src==="pdf" ? "Résumé · PDF Star Players 3e Saison" : "Résumé · livre de règles p. " + s.p}</div>`;
 }
 function skillChips(str){
   if (str === "—") return `<span class="none">Aucune</span>`;
@@ -156,6 +180,7 @@ function teamBody(t){
   <p class="lbl">Règles spéciales</p><div class="sks">${rules}</div>
   ${t.bigNote?`<p class="note">${esc(t.bigNote)}</p>`:""}
   <p class="lbl">Joueurs</p>${t.pl.map(playerCard).join("")}
+  ${(() => { const ss = ST.filter(s => starPlaysFor(s, t)).sort((a,b)=>a.n.localeCompare(b.n,"fr")); return ss.length ? `<p class="lbl">Star Players disponibles · ${ss.length}</p>` + ss.map(s => rowStar(s, `${fmtK(s.c)} po · ${esc(s.sk.split(/,\s*/).slice(0,3).join(", "))}…`)).join("") : ""; })()}
   <p class="note">Compétences : A Agilité · F Force · G Générale · M Mutation · P Passe · S Scélérate.</p>
   <div class="src">Fiche d'équipe · livre de règles p. ${t.p}</div>`;
 }
@@ -177,10 +202,12 @@ function renderSearch(q){
     const pls = t.pl.filter(p => score(p[1]+" "+p[2], words));
     if (pls.length) teamHits.push([t, pls.map(p=>p[1]).join(", ")]);
   });
+  const starHits = ST.filter(s => score(s.n+" "+s.sk+" "+(s.sr?s.sr.t+" "+s.sr.d:""), words));
   const sk = [...nameHits, ...textHits], ru = [...ruleName, ...ruleText];
   let html = "";
   if (sk.length) html += `<h2 class="group">Compétences & Traits · ${sk.length}</h2>` + sk.map(s=>rowSkill(s, nameHits.includes(s)?null:q)).join("");
   if (teamHits.length) html += `<h2 class="group">Équipes · ${teamHits.length}</h2>` + teamHits.map(([t,s]) => rowTeam(t, s ? highlight(esc(s), q) : null)).join("");
+  if (starHits.length) html += `<h2 class="group">Star Players · ${starHits.length}</h2>` + starHits.map(s => rowStar(s)).join("");
   if (ru.length) html += `<h2 class="group">Règles & Tableaux · ${ru.length}</h2>` + ru.map(r=>rowRule(r, q)).join("");
   $("#v-search").innerHTML = html || `<div class="empty">Rien trouvé pour « ${esc(q)} ».</div>`;
 }
@@ -204,7 +231,7 @@ function open(id){ const x = BY[id]; if (!x) return; if (stack.length) scrolls[s
 function render(){
   const id = stack[stack.length-1], x = BY[id];
   $("#sBack").classList.toggle("on", stack.length > 1);
-  $("#sheet").classList.toggle("tall", x.kind === "team");
+  $("#sheet").classList.toggle("tall", x.kind === "team" || x.kind === "star");
   if (x.kind === "skill") {
     $("#sDot").outerHTML = `<div class="dot" id="sDot" style="background:var(--c${x.cat})">${x.cat}</div>`;
     $("#sTitle").textContent = x.n;
@@ -222,6 +249,11 @@ function render(){
     $("#sTitle").textContent = x.n;
     $("#sMeta").textContent = `Équipe · ${x.pl.length} postes`;
     $("#sBody").innerHTML = teamBody(x);
+  } else if (x.kind === "star") {
+    $("#sDot").outerHTML = `<div class="dot emo" id="sDot">⭐</div>`;
+    $("#sTitle").textContent = x.n;
+    $("#sMeta").textContent = `Star Player · ${x.c} 000 po`;
+    $("#sBody").innerHTML = starBody(x);
   } else if (x.kind === "trule") {
     $("#sDot").outerHTML = `<div class="dot" id="sDot" style="background:var(--surface2);color:var(--gold)">★</div>`;
     $("#sTitle").textContent = x.t;
@@ -259,6 +291,8 @@ function setHH(){ document.documentElement.style.setProperty("--hh", $("header")
 document.addEventListener("click", e => {
   const a = e.target.closest("[data-id]");
   if (a) { e.preventDefault(); open(a.dataset.id); return; }
+  const g = e.target.closest("[data-seg]");
+  if (g) { teamSeg = g.dataset.seg; renderTeams(); window.scrollTo(0,0); return; }
   const c = e.target.closest("[data-cat]");
   if (c) { cat = c.dataset.cat; renderChips(); renderSkills(); window.scrollTo(0,0); return; }
   const n = e.target.closest("nav button");

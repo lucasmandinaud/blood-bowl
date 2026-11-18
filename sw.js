@@ -1,6 +1,6 @@
 // Cache hors-ligne. Change VERSION à chaque mise à jour du contenu.
-const VERSION = "bb-v22";
-const FILES = ["./","index.html","app.js","timer.js","data-skills.js","data-rules.js","data-teams.js","manifest.json","icon-180.png","icon-192.png","icon-512.png"];
+const VERSION = "bb-v23";
+const FILES = ["./","index.html","app.js","timer.js","data-skills.js","data-rules.js","data-teams.js","data-stars.js","manifest.json","icon-180.png","icon-192.png","icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k))))); self.clients.claim(); });
 self.addEventListener("fetch", e => {
