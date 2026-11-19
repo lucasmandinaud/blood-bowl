@@ -23,3 +23,7 @@ Les textes sont des résumés rédigés pour l'aide-mémoire. En cas de doute, c
 ## Feuille de match (Lutèce)
 
 Depuis l'onglet Timer, « 📝 Feuille de match » : saisie pendant et après le match, puis « Générer le PDF » (A4, mise en page de la feuille officielle) et partage vers Mail/Gmail. Le fond de la feuille est `fdm-bg.jpg` ; le code est dans `fdm.js`.
+
+## Mises à jour
+
+Avant de publier, lancer `tools/bump-version.sh` : l'app vérifie la version à chaque ouverture et se recharge seule.

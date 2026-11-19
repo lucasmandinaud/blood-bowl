@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="app-version" content="31">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bible Blood Bowl</title>
 <meta name="theme-color" content="#0e1712">
@@ -350,12 +351,37 @@ body.has-pill{padding-bottom:calc(148px + var(--safe-b))}
   <button data-tab="match"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M10 3h4M12 3v3M18.5 6.5l1.5-1.5"/></svg>Timer</button>
 </nav>
 
-<script src="data-skills.js?v=29"></script>
-<script src="data-rules.js?v=29"></script>
-<script src="data-teams.js?v=29"></script>
-<script src="data-stars.js?v=29"></script>
-<script src="app.js?v=29"></script>
-<script src="timer.js?v=29"></script>
-<script src="fdm.js?v=29"></script>
+<script src="data-skills.js?v=31"></script>
+<script src="data-rules.js?v=31"></script>
+<script src="data-teams.js?v=31"></script>
+<script src="data-stars.js?v=31"></script>
+<script src="app.js?v=31"></script>
+<script src="timer.js?v=31"></script>
+<script src="fdm.js?v=31"></script>
+<script>
+// Mise à jour automatique : à l'ouverture et au retour sur l'app, on télécharge index.html
+// sans cache et on compare son numéro de version (meta app-version) à celui affiché.
+// Si une nouvelle version est en ligne, on recharge avec ?v=… pour contourner le cache du téléphone.
+(() => {
+  const cur = document.querySelector('meta[name="app-version"]').content;
+  let last = 0;
+  async function check(){
+    if (location.protocol !== "https:" || Date.now() - last < 30000) return;
+    last = Date.now();
+    try {
+      const r = await fetch(location.pathname + "?check=" + Date.now(), {cache: "no-store"});
+      const m = (await r.text()).match(/name="app-version" content="([^"]+)"/);
+      if (!m || m[1] === cur) return;
+      const k = "bb-upd-" + m[1];
+      if (sessionStorage.getItem(k)) return;          // évite une boucle si le serveur hésite
+      sessionStorage.setItem(k, "1");
+      location.replace(location.pathname + "?v=" + m[1] + location.hash);
+    } catch(e) {}
+  }
+  check();
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") check(); });
+  window.addEventListener("pageshow", e => { if (e.persisted) check(); });
+})();
+</script>
 </body>
 </html>
