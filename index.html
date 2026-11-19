@@ -85,6 +85,58 @@ main{padding:0 16px}
 .tgrp summary .dice{font-size:12px;font-weight:800;background:var(--accent);color:#fff;padding:3px 8px;border-radius:7px}
 .tgrp .rgl{padding:0 6px 6px}
 .tgrp .card{background:var(--bg);margin-bottom:0}
+/* Feuille de match */
+.tm-fdm{display:block;width:100%;height:50px;border-radius:14px;background:var(--surface);border:1px solid var(--line);font-size:16px;font-weight:750;margin:6px 0 12px}
+.tm-fdm.hi{background:var(--surface2);border-color:var(--gold);color:var(--gold)}
+.fd-top{display:flex;align-items:center;gap:8px;margin:2px 0 10px}
+.fd-top h2.group{flex:1;margin:0;text-align:center}
+.fd-top button{height:34px;padding:0 12px;border-radius:10px;background:var(--surface);font-size:14px;font-weight:650;color:var(--muted)}
+.fd-sec summary{text-transform:none;letter-spacing:0;color:var(--text);font-size:16px}
+.fd-sec summary em{font-style:normal;font-size:12px;color:var(--muted);font-weight:700}
+.fd-dot{display:inline-block;width:10px;height:10px;border-radius:5px;margin-right:8px;vertical-align:1px}
+.fd-body{padding:0 14px 14px}
+.fd-row{margin-bottom:14px}
+.fd-lbl{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.fd-lbl small{text-transform:none;letter-spacing:0;font-weight:500;opacity:.8}
+.fd-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fd-heads{margin:0 0 10px;font-size:13px;font-weight:800;text-align:center}
+.fd-heads span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#v-fdm input,#v-fdm select{width:100%;min-width:0;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:16px;padding:0 10px;outline:none;-webkit-appearance:none;appearance:none}
+#v-fdm input:focus,#v-fdm select:focus{border-color:var(--gold)}
+#v-fdm .fd-j{width:110px;font-size:20px;font-weight:800}
+.fd-calc{height:42px;border-radius:10px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.fd-calc b{font-size:17px}.fd-calc small{font-size:10.5px;color:var(--muted)}
+.fd-quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.fd-quick button{height:30px;padding:0 10px;border-radius:15px;border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.fd-cnt{display:flex;align-items:center;height:42px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.fd-cnt button{width:40px;height:100%;font-size:22px;font-weight:600;color:var(--gold)}
+.fd-cnt b{flex:1;text-align:center;font-size:18px}
+.fd-seg{display:flex;gap:3px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px;min-height:42px}
+.fd-seg button{flex:1;min-width:0;border-radius:7px;font-size:14px;font-weight:700;color:var(--muted)}
+.fd-seg button.on{background:var(--surface2);color:var(--text);box-shadow:inset 0 0 0 1px var(--gold)}
+.fd-pl{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
+.fd-pl.jpv{border-color:var(--gold)}
+.fd-ph{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.fd-ph label{display:flex;align-items:center;gap:6px;font-weight:800;color:var(--muted)}
+#v-fdm .fd-ph input{width:64px;height:38px;font-size:18px;font-weight:800;text-align:center;background:var(--surface)}
+.fd-psp{flex:1;font-size:12.5px;font-weight:700;color:var(--cS)}
+.fd-jpv{height:34px;padding:0 10px;border-radius:9px;border:1px solid var(--line);font-size:13px;font-weight:700;color:var(--muted)}
+.fd-jpv.on{border-color:var(--gold);color:var(--gold);background:var(--surface2)}
+.fd-del{width:34px;height:34px;border-radius:9px;color:var(--muted);font-size:15px}
+.fd-cnts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fd-cnts small{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:3px}
+.fd-cnts .fd-cnt{background:var(--surface)}
+.fd-more{margin-top:10px}
+.fd-more summary{font-size:13.5px;font-weight:700;color:var(--gold);cursor:pointer;padding:4px 0}
+.fd-sk{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0}
+.fd-sk small{display:block;font-size:10.5px;color:var(--muted);margin-bottom:3px;white-space:nowrap}
+#v-fdm .fd-sk input{height:38px;font-size:14px;padding:0 6px;background:var(--surface)}
+.fd-inj{display:flex;gap:6px}
+.fd-inj button{flex:1;height:38px;border-radius:9px;border:1px solid var(--line);font-weight:750;color:var(--muted)}
+.fd-inj button.on{background:#8f1a14;border-color:#c0392b;color:#fff}
+.fd-add{display:block;width:100%;height:44px;border-radius:12px;border:1px dashed var(--line);color:var(--gold);font-weight:750;font-size:15px;margin-bottom:8px}
+.fd-prev{padding:6px}.fd-prev img{display:block;width:100%;border-radius:8px}
+.fd-send{background:var(--cS)}
 h2.group{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:18px 2px 8px;font-weight:800}
 .count{color:var(--muted);font-size:13px;margin:4px 2px 8px}
 .count a.x{color:var(--gold);text-decoration:none;border-bottom:1px dotted var(--gold);cursor:pointer}
@@ -271,6 +323,7 @@ body.has-pill{padding-bottom:calc(148px + var(--safe-b))}
   <section class="view" id="v-tables"></section>
   <section class="view" id="v-teams"></section>
   <section class="view" id="v-match"></section>
+  <section class="view" id="v-fdm"></section>
   <section class="view" id="v-search"></section>
 </main>
 
@@ -296,11 +349,12 @@ body.has-pill{padding-bottom:calc(148px + var(--safe-b))}
   <button data-tab="match"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M10 3h4M12 3v3M18.5 6.5l1.5-1.5"/></svg>Timer</button>
 </nav>
 
-<script src="data-skills.js?v=27"></script>
-<script src="data-rules.js?v=27"></script>
-<script src="data-teams.js?v=27"></script>
-<script src="data-stars.js?v=27"></script>
-<script src="app.js?v=27"></script>
-<script src="timer.js?v=27"></script>
+<script src="data-skills.js?v=28"></script>
+<script src="data-rules.js?v=28"></script>
+<script src="data-teams.js?v=28"></script>
+<script src="data-stars.js?v=28"></script>
+<script src="app.js?v=28"></script>
+<script src="timer.js?v=28"></script>
+<script src="fdm.js?v=28"></script>
 </body>
 </html>

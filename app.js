@@ -357,6 +357,7 @@ function show(t){
   document.dispatchEvent(new CustomEvent("bb:view", {detail: view}));
   setHH();
 }
+window.bbShow = show;
 function setHH(){ document.documentElement.style.setProperty("--hh", $("header").offsetHeight + "px"); }
 
 // ---------- Évènements ----------

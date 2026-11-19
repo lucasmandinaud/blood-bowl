@@ -135,7 +135,8 @@ function setupView(){
   const res = cfg.mode === "total"
     ? `<b>${fmtLong(b)}</b> par tour · ${4*TURNS} tours (${TURNS} par coach et par mi-temps)`
     : `Tours : <b>${hm(Math.round(b * 4 * TURNS / 60000))}</b> max, plus les coups d'envoi`;
-  return `<h2 class="group">⏱️ Chrono de match</h2>
+  return `<button class="tm-fdm hi" data-fdm>📝 Feuille de match</button>
+  <h2 class="group">⏱️ Chrono de match</h2>
   <div class="card tm-card">
     ${seg("mode", [["total","On a X heures"],["turn","Minutes par tour"]], cfg.mode)}
     ${cfg.mode === "total"
@@ -179,7 +180,8 @@ function runView(){
   </div>
   <div class="tm-row"><button class="tm-stop" data-ta="reset">⏹ Arrêter le match</button></div>
   ${scoreCards()}
-  <p class="pnote" id="tmEta"></p>`;
+  <p class="pnote" id="tmEta"></p>
+  <button class="tm-fdm" data-fdm>📝 Feuille de match</button>`;
 }
 function halfView(){
   const w = (st.first + 1) % 2;
@@ -187,14 +189,16 @@ function halfView(){
   <div class="card tm-card" style="text-align:center"><div style="font-size:40px">🍺</div><p><b>Fin de la 1re mi-temps.</b><br>${esc(cfg.names[w])} reçoit et joue en premier.</p></div>
   <button class="tm-big" data-ta="half">▶ Coup d'envoi 2e mi-temps</button>
   <div class="tm-row"><button data-ta="undo">↩ Annuler fin de tour</button><button class="tm-stop" data-ta="reset">⏹ Arrêter le match</button></div>
-  ${scoreCards()}`;
+  ${scoreCards()}
+  <button class="tm-fdm" data-fdm>📝 Feuille de match</button>`;
 }
 function doneView(){
   return `<h2 class="group">🏁 Fin du match</h2>
   <div class="card tm-card" style="text-align:center"><p><b>Durée totale : ${fmtLong(st.matchEnd - st.matchStart)}</b><br><span class="pnote">Commencé à ${clock(st.matchStart)}, fini à ${clock(st.matchEnd)}</span></p></div>
   ${scoreCards()}
   <div class="tm-row"><button data-ta="undo">↩ Annuler fin de tour</button></div>
-  <button class="tm-big" data-ta="reset">Nouveau match</button>`;
+  <button class="tm-big" data-ta="reset">Nouveau match</button>
+  <button class="tm-fdm hi" data-fdm>📝 Feuille de match</button>`;
 }
 function render(){
   const v = $("#v-match");

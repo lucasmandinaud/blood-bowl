@@ -19,3 +19,7 @@ C'est une web app installable (PWA) qui fonctionne hors-ligne.
 Après une modification, augmentez `VERSION` dans `sw.js` (ex : `bb-v22`) pour que les téléphones récupèrent la nouvelle version.
 
 Les textes sont des résumés rédigés pour l'aide-mémoire. En cas de doute, c'est le livre de règles officiel qui fait foi.
+
+## Feuille de match (Lutèce)
+
+Depuis l'onglet Timer, « 📝 Feuille de match » : saisie pendant et après le match, puis « Générer le PDF » (A4, mise en page de la feuille officielle) et partage vers Mail/Gmail. Le fond de la feuille est `fdm-bg.jpg` ; le code est dans `fdm.js`.
