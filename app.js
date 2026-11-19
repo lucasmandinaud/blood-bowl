@@ -345,7 +345,7 @@ function back(){ if (stack.length > 1) { scrolls.length = stack.length - 1; stac
 
 
 // ---------- Navigation ----------
-let tab = "skills";
+let tab = "rules";
 function show(t){
   tab = t;
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab===t));
@@ -400,7 +400,7 @@ $("#sheet").addEventListener("touchstart", e => { if ($("#sBody").scrollTop <= 0
 $("#sheet").addEventListener("touchmove", e => { if (y0===null) return; const dy = e.touches[0].clientY - y0; if (dy > 0) $("#sheet").style.transform = `translateY(${dy}px)`; }, {passive:true});
 $("#sheet").addEventListener("touchend", e => { if (y0===null) return; const dy = e.changedTouches[0].clientY - y0; $("#sheet").style.transform = ""; y0 = null; if (dy > 90) back(); });
 
-renderChips(); renderSkills(); renderRules(); renderTables(); renderTeams(); show("skills");
+renderChips(); renderSkills(); renderRules(); renderTables(); renderTeams(); show("rules");
 
 if ("serviceWorker" in navigator && location.protocol === "https:") {
   // Quand une nouvelle version s'installe, on recharge une fois pour l'afficher tout de suite
