@@ -138,6 +138,7 @@ function renderTables(){
   html += TB.map(t => fold(`${t.e} ${esc(t.t)}`, t.dice, `<div class="card">${tableRows(t)}</div>`)).join("");
   html += fold("🎯 Portées de passe", "CP", passCard().replace(/\s*<h3>.*?<\/h3>/, ""));
   $("#v-tables").innerHTML = html;
+  document.querySelectorAll("#v-tables .card").forEach(c => linkDom(c));
 }
 
 // ---------- Équipes ----------
@@ -256,6 +257,7 @@ function renderSearch(q){
 // ---------- Fiche détaillée ----------
 const NOLINK = new Set(["Passe","Blocage","Réception","Saut","Lancer de Coéquipier"]);
 const NAMES = SK.filter(s => !NOLINK.has(s.n)).map(s => ({id:s.id, re: s.n.replace(/ \(X\+?\)/,"")})).sort((a,b)=>b.re.length-a.re.length);
+NAMES.forEach(n => n.rx = new RegExp(`(?<!Zones? de)(^|[\\s(«"'’])(${n.re.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})(?![\\wÀ-ÿ])`));
 function linkify(text, selfId){
   let html = esc(text);
   const used = new Set();
@@ -265,6 +267,31 @@ function linkify(text, selfId){
     if (rx.test(html)) { html = html.replace(rx, `$1<a class="x" data-id="${id}">$2</a>`); used.add(id); }
   });
   return html;
+}
+// Ajoute des liens vers les compétences/traits cités dans un bloc déjà affiché
+// (1re mention de chaque compétence par bloc ; on ne touche ni aux liens existants ni aux boutons)
+function linkDom(root, selfId){
+  if (!root) return;
+  const used = new Set([selfId, ...[...root.querySelectorAll("[data-id]")].map(a => a.dataset.id)]);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n =>
+    n.parentElement.closest("a,button,.src,summary,h3,.dice,.r") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  while (nodes.length) {
+    const node = nodes.shift(), txt = node.nodeValue;
+    let best = null;
+    for (const n of NAMES) {
+      if (used.has(n.id)) continue;
+      const m = n.rx.exec(txt);
+      if (m && (!best || m.index + m[1].length < best.i)) best = {n, i: m.index + m[1].length, len: m[2].length};
+    }
+    if (!best) continue;
+    used.add(best.n.id);
+    const a = document.createElement("a");
+    a.className = "x"; a.dataset.id = best.n.id; a.textContent = txt.substr(best.i, best.len);
+    const after = node.splitText(best.i); after.nodeValue = after.nodeValue.slice(best.len);
+    node.parentNode.insertBefore(a, after);
+    nodes.unshift(node, after);
+  }
 }
 let stack = [];
 let scrolls = [];
@@ -306,6 +333,7 @@ function render(){
     $("#sMeta").textContent = "Tableau · " + x.dice;
     $("#sBody").innerHTML = tableCard(x).replace('class="card"','class="card" style="padding:0;background:none"').replace(/<h3>.*?<\/h3>/,"") + `<div class="src">Résumé · livre de règles p. ${x.p}</div>`;
   }
+  linkDom($("#sBody"), id);
   $("#sBody").scrollTop = scrolls[stack.length-1] || 0;
   if (!$("#sheet").classList.contains("on")) { $("#scrim").classList.add("on"); $("#sheet").classList.add("on"); }
 }
