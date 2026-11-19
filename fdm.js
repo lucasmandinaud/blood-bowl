@@ -110,14 +110,6 @@ function refreshCalc(){
 }
 function dropPdf(){ pdfFile = null; if (pdfUrl) URL.revokeObjectURL(pdfUrl); pdfUrl = ""; const o = $("#fdOut"); if (o) o.innerHTML = ""; }
 
-// Pré-remplit les coachs depuis le Timer quand c'est vide
-function prefill(){
-  try {
-    const t = JSON.parse(localStorage.getItem("bb-timer"));
-    const names = t && t.cfg && t.cfg.names || [];
-    names.forEach((n, i) => { if (S.t[i] && !S.t[i].coach && n && !/^Coach \d$/.test(n)) S.t[i].coach = n; });
-  } catch(e){}
-}
 
 // ---------- Évènements ----------
 document.addEventListener("click", e => {
@@ -125,10 +117,9 @@ document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const d = b.dataset, i = +(d.t ?? d.addp), t = S.t[i];
   if ("fdnew" in d) {
-    if (!confirm("Commencer une nouvelle feuille ?\n\nToute la feuille actuelle est effacée (le n° de journée passe au suivant).")) return;
-    const j = parseInt(S.j, 10);
-    S = { j: isNaN(j) ? "" : String(j + 1), met:"", t:[newTeam(), newTeam()] };
-    prefill(); save(); dropPdf(); render(); return;
+    if (!confirm("Commencer une nouvelle feuille ?\n\nToute la feuille actuelle est effacée.")) return;
+    S = { j:"", met:"", t:[newTeam(), newTeam()] };
+    save(); dropPdf(); render(); return;
   }
   if ("pdf" in d) { makePdf(); return; }
   if ("share" in d) { sharePdf(); return; }
@@ -295,5 +286,5 @@ async function sharePdf(){
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-document.addEventListener("bb:view", e => { if (e.detail === "fdm") { prefill(); save(); render(); } });
+document.addEventListener("bb:view", e => { if (e.detail === "fdm") render(); });
 })();
