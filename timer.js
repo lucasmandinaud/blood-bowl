@@ -8,12 +8,12 @@ const KEY = "bb-timer";
 const TURNS = 8;                       // tours par coach et par mi-temps
 const COL = ["var(--cA)", "var(--cF)"];
 
-const DEF_CFG = { mode:"total", totalMin:120, setupMin:15, turnMin:4, carry:false, cap:0, names:["Coach 1","Coach 2"], first:0, v:2 };
+const DEF_CFG = { mode:"total", totalMin:120, setupMin:15, turnMin:4, carry:true, cap:0, names:["Coach 1","Coach 2"], first:0, v:3 };
 let cfg = {...DEF_CFG}, st = {phase:"setup"};
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) {
   cfg = {...DEF_CFG, ...s.cfg}; st = s.st || st;
-  // Nouveaux réglages par défaut (crédit décoché, sans plafond), appliqués une fois aux téléphones déjà configurés
-  if (!s.cfg || s.cfg.v !== 2) { cfg.carry = false; cfg.cap = 0; cfg.v = 2; localStorage.setItem(KEY, JSON.stringify({cfg, st})); }
+  // Crédit de temps réactivé par défaut (sans plafond), appliqué une fois aux téléphones déjà configurés
+  if (!s.cfg || s.cfg.v !== 3) { cfg.carry = true; cfg.cap = 0; cfg.v = 3; localStorage.setItem(KEY, JSON.stringify({cfg, st})); }
 } } catch(e){}
 // Les noms des coachs ne sont gardés que pendant un match (pour survivre à une fermeture de l'app) :
 // à l'ouverture, hors match en cours, on repart de « Coach 1 » / « Coach 2 ».
