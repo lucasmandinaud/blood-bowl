@@ -74,11 +74,13 @@ function renderSkills(){
   list.forEach(s => { const l = norm(s.n[0]).toUpperCase(); if (l !== L) { L = l; html += `<div class="letter">${l}</div>`; } html += rowSkill(s); });
   $("#v-skills").innerHTML = html;
 }
+// Émoji affiché devant chaque catégorie de l'onglet Règles
+const RULE_ICONS = {"Le Tour":"⏱️","Mouvement":"🏃","Blocage":"💥","Blessures":"🩹","Agression":"🥾","Ballon":"🏈","Match":"🏟️","Ligue":"🏆"};
 function renderRules(){
   // Catégories repliées par défaut : toucher un titre déplie son contenu
   const groups = [];
   RU.forEach(r => { let g = groups.find(x => x.g === r.g); if (!g) groups.push(g = {g: r.g, l: []}); g.l.push(r); });
-  $("#v-rules").innerHTML = groups.map(({g, l}) => `<details class="rgrp"><summary><span>${esc(g)}</span><i>${l.length}</i></summary><div class="rgl">${l.map(r => rowRule(r)).join("")}</div></details>`).join("");
+  $("#v-rules").innerHTML = groups.map(({g, l}) => `<details class="rgrp"><summary>${RULE_ICONS[g] ? `<b class="ico">${RULE_ICONS[g]}</b>` : ""}<span>${esc(g)}</span><i>${l.length}</i></summary><div class="rgl">${l.map(r => rowRule(r)).join("")}</div></details>`).join("");
 }
 // Bloc repliable (fermé par défaut) avec, à droite, l'indication des dés
 const fold = (title, dice, inner) => `<details class="rgrp tgrp"><summary><span>${title}</span>${dice ? `<b class="dice">${dice}</b>` : ""}</summary><div class="rgl">${inner}</div></details>`;
