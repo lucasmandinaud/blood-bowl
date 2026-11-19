@@ -211,7 +211,110 @@ window.BB_RULES = [
 {id:"finphase",g:"Match",t:"Fin de Phase",p:82,k:"mi-temps fin du match prolongations",b:`
 <ol class="steps"><li>Armes Secrètes Expulsées</li><li>Effets de fin de Phase (météo d'abord)</li><li>K.-O. : D6, 4+ ils reviennent</li><li>Fin de la Phase</li></ol>
 <p>Après un Touchdown, l'équipe qui a marqué engage. À la mi-temps, l'équipe qui a reçu au début engage. 8 Tours par équipe et par mi-temps.</p>
-<p class="note">Prolongations : 8 Tours, Relances non récupérées. Puis Tirs au But : 5 tirs au dé.</p>`}
+<p class="note">Prolongations : 8 Tours, Relances non récupérées. Puis Tirs au But : 5 tirs au dé.</p>`},
+// ---------- Ligue (Jeu en Ligue, p. 94-106) ----------
+{id:"lg-avant",g:"Ligue",t:"Avant-match en Ligue",p:94,k:"journaliers coups de pouce petite monnaie vea inducements",b:`
+<p class="lbl"><b>Journaliers</b></p>
+<ul><li>Si l'équipe ne peut pas aligner 11 joueurs, elle complète avec des Journaliers.</li>
+<li>Journalier = un Trois-quarts de la Fiche d'Équipe (QTÉ 0-16) qui gagne <b>Solitaire (4+)</b>.</li>
+<li>Ils ne font jamais dépasser 11 joueurs disponibles et comptent dans la VEA.</li></ul>
+<p class="lbl"><b>Coups de Pouce</b> (liste p. 142)</p>
+<ol class="steps"><li>L'équipe à la <b>VEA la plus haute</b> peut acheter en puisant dans sa Trésorerie.</li>
+<li>L'autre reçoit une <b>Petite Monnaie</b> = écart de VEA + ce que l'adversaire vient de dépenser.</li>
+<li>Elle peut y ajouter jusqu'à <b>50 000 po</b> de sa Trésorerie. Ce qui n'est pas dépensé est perdu.</li></ol>
+<p class="note">VEA identiques : personne ne puise dans sa Trésorerie.</p>`},
+{id:"lg-apres",g:"Ligue",t:"Séquence d'après-match",p:95,k:"apres match fin de match etapes post match",b:`
+<p>À résoudre dans l'ordre, par les deux coachs :</p>
+<ol class="steps"><li><b>Résultats et Gains</b> : score, TD, Éliminations (celles qui rapportent des PSP), Points de Ligue, puis Gains.</li>
+<li><b>Fans Dévoués</b> : jet de D6 selon le résultat.</li>
+<li><b>Amélioration des joueurs</b> : attribuer puis dépenser les PSP.</li>
+<li><b>Embauches, renvois, retraite temporaire</b>.</li>
+<li><b>Erreurs Coûteuses</b> si Trésorerie ≥ 100 000 po.</li>
+<li><b>Préparer la prochaine rencontre</b> : mettre à jour VE et VEA.</li></ol>`},
+{id:"lg-gains",g:"Ligue",t:"Gains & Fans Dévoués",p:95,k:"gains argent tresorerie affluence fans devoues popularite",b:`
+<div class="formula">Gains = (Affluence ÷ 2 + TD marqués + 1 si personne n'a Temporisé) × 10 000 po</div>
+<p class="note">Affluence = Facteur de Popularité des deux équipes additionnés. Ex. : 4 + 3 = 7 → 3,5 + 2 TD + 1 = 6,5 → 65 000 po.</p>
+<p class="lbl"><b>Fans Dévoués</b> (entre 1 et 7)</p>
+<table class="t"><tr><th>Résultat</th><th>Jet D6</th></tr>
+<tr><td>Victoire</td><td>≥ Fans Dévoués → <b>+1</b></td></tr>
+<tr><td>Défaite</td><td>&lt; Fans Dévoués → <b>−1</b></td></tr>
+<tr><td>Nul</td><td>Pas de changement</td></tr></table>`},
+{id:"lg-psp",g:"Ligue",t:"Points de Star Player (PSP)",p:96,k:"psp spp experience joueur du match jdm mvp touchdown elimination reussite interception",b:`
+<table class="t"><tr><th>Exploit</th><th>PSP</th></tr>
+<tr><td>Réussite (Passe Précise réceptionnée sans Rebond)</td><td><b>1</b></td></tr>
+<tr><td>Lancer Superbe d'un coéquipier qui atterrit debout</td><td><b>1</b></td></tr>
+<tr><td>Joueur lancé qui atterrit debout</td><td><b>1</b></td></tr>
+<tr><td>Interception</td><td><b>2</b></td></tr>
+<tr><td>Élimination infligée sur un Blocage</td><td><b>2</b></td></tr>
+<tr><td>Touchdown</td><td><b>3</b></td></tr>
+<tr><td>Joueur du Match (JDM)</td><td><b>4</b></td></tr></table>
+<ul><li><b>JDM</b> : chaque coach désigne 6 joueurs ayant joué, numérotés 1 à 6, puis jette un D6.</li>
+<li>L'Élimination compte même si Apothicaire ou Régénération l'annule. Pas de PSP pour une Agression, une Action Spéciale ou le Public.</li>
+<li>Les Star Players ne gagnent pas de PSP ; les Journaliers, si.</li></ul>`},
+{id:"lg-amelio",g:"Ligue",t:"Améliorations de joueur",p:97,k:"progression ameliorations competence caracteristique psp cout hausse de valeur",b:`
+<table class="t"><tr><th></th><th>Hasard Princ.</th><th>Choix Princ.</th><th>Choix Second.</th><th>Caract.</th></tr>
+<tr><td>1<sup>re</sup></td><td>3</td><td>6</td><td>10</td><td>14</td></tr>
+<tr><td>2<sup>e</sup></td><td>4</td><td>8</td><td>12</td><td>16</td></tr>
+<tr><td>3<sup>e</sup></td><td>6</td><td>12</td><td>16</td><td>20</td></tr>
+<tr><td>4<sup>e</sup></td><td>8</td><td>16</td><td>20</td><td>24</td></tr>
+<tr><td>5<sup>e</sup></td><td>10</td><td>20</td><td>24</td><td>28</td></tr>
+<tr><td>6<sup>e</sup></td><td>15</td><td>30</td><td>34</td><td>38</td></tr></table>
+<p class="note">Coûts en PSP, selon le rang de l'amélioration (Expérimenté, Vétéran, Future Star, Star, Superstar, Légende).</p>
+<ul><li>On peut garder ses PSP, <b>sauf</b> si le joueur a de quoi payer une amélioration de Caractéristique : il doit alors prendre une amélioration (pas forcément celle-là).</li>
+<li><b>Au hasard</b> : choisir une catégorie, jeter 2 D6 l'un après l'autre (tableau p. 121), deux fois, puis garder l'une des deux. Compétence déjà possédée ou inutilisable : relancer.</li>
+<li>Compétence d'Élite : +10 000 po de valeur en plus.</li></ul>
+<p class="lbl"><b>Caractéristique (D8)</b></p>
+<table class="t"><tr><th>D8</th><th>Au choix</th></tr>
+<tr><td>1</td><td>AR</td></tr><tr><td>2</td><td>AR ou CP</td></tr><tr><td>3-4</td><td>AR, M ou CP</td></tr>
+<tr><td>5</td><td>M ou CP</td></tr><tr><td>6</td><td>AG ou M</td></tr><tr><td>7</td><td>AG ou F</td></tr><tr><td>8</td><td>Au choix</td></tr></table>
+<p class="note">Résultat refusé : prendre une Compétence Principale ou Secondaire à la place (les PSP restent dépensés). Une Caractéristique ne s'améliore que 2 fois au maximum.</p>
+<p class="lbl"><b>Hausse de valeur</b></p>
+<table class="t"><tr><td>Compétence Principale</td><td>+20 000</td></tr><tr><td>Compétence Secondaire</td><td>+40 000</td></tr>
+<tr><td>+1 AR</td><td>+10 000</td></tr><tr><td>+1 M ou +1 CP</td><td>+20 000</td></tr><tr><td>+1 AG</td><td>+30 000</td></tr><tr><td>+1 F</td><td>+60 000</td></tr></table>`},
+{id:"lg-embauche",g:"Ligue",t:"Embauches, renvois & retraite",p:99,k:"recruter embaucher renvoyer journalier relance staff retraite temporaire",b:`
+<ol class="steps"><li>Retirer les joueurs Morts.</li>
+<li>Embaucher de nouveaux joueurs avec la Trésorerie (16 joueurs max).</li>
+<li>Renvoyer des joueurs si on veut, sans tomber sous <b>11 joueurs disponibles</b>.</li>
+<li>Staff de Banc de Touche : embaucher ou renvoyer. Relances supplémentaires au <b>double</b> de leur coût (impossible d'en retirer).</li>
+<li>Journaliers du match : les garder en payant leur coût + leurs hausses de valeur. Ils perdent Solitaire et gardent leurs PSP.</li></ol>
+<p class="lbl"><b>Retraite Temporaire</b></p>
+<p>Après une Séquelle, on peut mettre le joueur au repos jusqu'à la fin de la saison. Il reste sur la liste (compte dans les 16) mais pas dans la VEA.</p>`},
+{id:"lg-erreurs",g:"Ligue",t:"Erreurs Coûteuses & VE",p:100,k:"erreurs couteuses tresorerie incident catastrophe valeur d'equipe vea ve",b:`
+<p>Si la Trésorerie est d'au moins <b>100 000 po</b>, jeter un D6 dans la tranche correspondante :</p>
+<table class="t"><tr><th>Trésorerie</th><th>D6</th></tr>
+<tr><td>100–195k</td><td>1 Mineur · 2-6 Évitée</td></tr>
+<tr><td>200–295k</td><td>1-2 Mineur · 3-6 Évitée</td></tr>
+<tr><td>300–395k</td><td>1 Majeur · 2-3 Mineur · 4-6 Évitée</td></tr>
+<tr><td>400–495k</td><td>1-2 Majeur · 3-4 Mineur · 5-6 Évitée</td></tr>
+<tr><td>500–595k</td><td>1 Catastrophe · 2-3 Majeur · 4-5 Mineur · 6 Évitée</td></tr>
+<tr><td>600k+</td><td>1-2 Catastrophe · 3-4 Majeur · 5-6 Mineur</td></tr></table>
+<ul><li><b>Crise Évitée</b> : rien.</li><li><b>Incident Mineur</b> : −D3 × 10 000 po.</li>
+<li><b>Incident Majeur</b> : Trésorerie ÷ 2 (arrondi aux 5 000 inférieurs).</li>
+<li><b>Catastrophe</b> : il ne reste que 2D6 × 10 000 po.</li></ul>
+<p class="lbl"><b>Préparer la prochaine rencontre</b> (p. 91)</p>
+<ul><li><b>VE</b> = valeur actuelle des joueurs + staff + relances (ni Fans Dévoués ni Trésorerie).</li>
+<li><b>VEA</b> = VE − joueurs qui ratent le prochain match ou en Retraite Temporaire (+ Journaliers).</li></ul>`},
+{id:"lg-conceder",g:"Ligue",t:"Concéder le match",p:101,k:"conceder abandon abandonner",b:`
+<p>Possible au début de n'importe lequel de ses Tours. L'équipe qui concède :</p>
+<ul><li>perd <b>2-0</b> (ou X-0 si l'adversaire avait déjà marqué plus) ;</li>
+<li>n'a ni JDM (l'adversaire en élit un 2<sup>e</sup>) ni Gains (l'adversaire touche toute l'Affluence + ses TD × 10 000) ;</li>
+<li>perd tous les PSP du match et D3 Fans Dévoués (minimum 1) ;</li>
+<li>D6 pour chaque joueur à 3 améliorations ou plus : sur 1-3, il quitte l'équipe.</li></ul>
+<p class="note"><b>Sans pénalité</b> : si l'équipe ne peut pas mettre 3 joueurs sur la Ligne d'Engagement, elle perd 2-0 (ou X-0) sans autre conséquence.</p>`},
+{id:"lg-points",g:"Ligue",t:"Points de Ligue & Play-offs",p:103,k:"classement points de ligue victoire nul defaite playoffs trophee amical",b:`
+<table class="t"><tr><th>Résultat</th><th>Points</th></tr>
+<tr><td>Victoire</td><td><b>3</b></td></tr><tr><td>Nul</td><td><b>1</b></td></tr><tr><td>Défaite</td><td><b>0</b></td></tr></table>
+<p>Bonus possibles (au choix du Commissaire) : <b>+1</b> pour 3 TD marqués ou plus, <b>+1</b> pour 0 TD encaissé, <b>+1</b> pour 3 Éliminations ou plus (celles qui rapportent des PSP).</p>
+<p class="lbl"><b>Play-offs</b></p>
+<ul><li>Élimination directe, avec Prolongations et Tirs au But si besoin.</li>
+<li>Prix : <b>1<sup>er</sup> 100 000 po</b> + Trophée, 2<sup>e</sup> 60 000, 3<sup>e</sup> 30 000 (après les Erreurs Coûteuses).</li>
+<li>Trophée de Ligue : une Relance d'Équipe gratuite tant qu'on le détient (compte dans la VE).</li></ul>
+<p class="note">Match amical : ni PSP, ni Points de Ligue, ni Gains. Toute Élimination devient une Commotion.</p>`},
+{id:"lg-horssaison",g:"Ligue",t:"Hors saison & réenrôlement",p:105,k:"hors saison reenroler reenrolement nouvelle saison budget redraft",b:`
+<ol class="steps"><li><b>Repos</b> : les joueurs qui devaient rater un match sont remis. D6 par Blessure Persistante et par réduction de Caractéristique en Retraite Temporaire (+1 avec Apothicaire) : 4+ elle disparaît. D6 par Haine (X) acquise : 4+ elle disparaît.</li>
+<li><b>Budget</b> = 1 000 000 po + Trésorerie restante + 20 000 par match joué + 20 000 par victoire + 10 000 par nul. Plafond conseillé : 1 300 000.</li>
+<li><b>Réenrôlement</b> : nouvelle liste. Staff et relances au coût normal ; chaque joueur gardé coûte sa valeur actuelle + <b>20 000 par saison déjà jouée</b>.</li></ol>
+<p class="note">Un joueur en Retraite Temporaire non réenrôlé part à la retraite.</p>`}
 ];
 
 // Tableaux de référence
