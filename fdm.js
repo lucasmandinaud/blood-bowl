@@ -90,7 +90,7 @@ function apres(){
 function render(){
   const v = $("#v-fdm"); if (!v) return;
   const y = window.scrollY;
-  v.innerHTML = `<div class="fd-top"><button data-fdback>‹ Timer</button><h2 class="group">📝 Feuille de match</h2><button data-fdnew>Nouvelle</button></div>
+  v.innerHTML = `<div class="fd-top"><h2 class="group">📝 Feuille de match</h2><button data-fdnew>＋ Nouvelle feuille</button></div>
   ${sec("infos", "📋 Infos du match", heads() + infos())}
   ${[0,1].map(i => sec("pl" + i, `<i class="fd-dot" style="background:${COLS[i]}"></i>Joueurs · ${esc(teamName(i))}`, players(i), `<em>${S.t[i].pl.filter(filled).length}</em>`)).join("")}
   ${sec("apres", "💰 Séquence d'après-match", apres())}
@@ -118,20 +118,12 @@ function prefill(){
     names.forEach((n, i) => { if (S.t[i] && !S.t[i].coach && n && !/^Coach \d$/.test(n)) S.t[i].coach = n; });
   } catch(e){}
 }
-function openFdm(){
-  prefill(); save();
-  if (window.bbShow) window.bbShow("fdm");
-  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === "match"));
-  render(); window.scrollTo(0, 0);
-}
 
 // ---------- Évènements ----------
 document.addEventListener("click", e => {
-  if (e.target.closest("[data-fdm]")) { openFdm(); return; }
   const v = e.target.closest("#v-fdm"); if (!v) return;
   const b = e.target.closest("button"); if (!b) return;
   const d = b.dataset, i = +(d.t ?? d.addp), t = S.t[i];
-  if ("fdback" in d) { document.querySelector('nav button[data-tab="match"]').click(); return; }
   if ("fdnew" in d) {
     if (!confirm("Commencer une nouvelle feuille ?\n\nL'équipe 1 (nom, roster, coach) est gardée, tout le reste est effacé.")) return;
     const keep = S.t[0], j = parseInt(S.j, 10);
@@ -303,5 +295,5 @@ async function sharePdf(){
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-document.addEventListener("bb:view", e => { if (e.detail === "fdm") render(); });
+document.addEventListener("bb:view", e => { if (e.detail === "fdm") { prefill(); save(); render(); } });
 })();

@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="app-version" content="31">
+<meta name="app-version" content="32">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bible Blood Bowl</title>
 <meta name="theme-color" content="#0e1712">
@@ -90,7 +90,10 @@ main{padding:0 16px}
 .tm-fdm{display:block;width:100%;height:50px;border-radius:14px;background:var(--surface);border:1px solid var(--line);font-size:16px;font-weight:750;margin:6px 0 12px}
 .tm-fdm.hi{background:var(--surface2);border-color:var(--gold);color:var(--gold)}
 .fd-top{display:flex;align-items:center;gap:8px;margin:2px 0 10px}
-.fd-top h2.group{flex:1;margin:0;text-align:center}
+.fd-top .sep-h{font-size:13px;font-weight:850;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:4px 0 10px;display:flex;align-items:center;gap:10px}
+.sep-h:after{content:"";flex:1;height:1px;background:var(--line)}
+.sep-t{margin-top:26px;padding-top:18px;border-top:2px solid var(--line)}
+h2.group{flex:1;margin:0;text-align:center}
 .fd-top button{height:34px;padding:0 12px;border-radius:10px;background:var(--surface);font-size:14px;font-weight:650;color:var(--muted)}
 .fd-sec summary{text-transform:none;letter-spacing:0;color:var(--text);font-size:16px}
 .fd-sec summary em{font-style:normal;font-size:12px;color:var(--muted);font-weight:700}
@@ -321,8 +324,12 @@ body.has-pill{padding-bottom:calc(148px + var(--safe-b))}
 
 <main>
   <section class="view on" id="v-skills"></section>
-  <section class="view" id="v-rules"></section>
-  <section class="view" id="v-tables"></section>
+  <section class="view" id="v-rules">
+    <h2 class="sep-h">📖 Règles</h2>
+    <div id="v-rules-in"></div>
+    <h2 class="sep-h sep-t">🎲 Tableaux</h2>
+    <div id="v-tables"></div>
+  </section>
   <section class="view" id="v-teams"></section>
   <section class="view" id="v-match"></section>
   <section class="view" id="v-fdm"></section>
@@ -345,19 +352,19 @@ body.has-pill{padding-bottom:calc(148px + var(--safe-b))}
 
 <nav>
   <button data-tab="skills" class="on"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Compétences</button>
-  <button data-tab="rules"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>Règles</button>
-  <button data-tab="tables"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3"/><circle cx="15" cy="15" r="1.3"/><circle cx="15" cy="9" r="1.3"/><circle cx="9" cy="15" r="1.3"/></svg>Tableaux</button>
+  <button data-tab="rules"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg><span>Règles &amp;<br>Tableaux</span></button>
   <button data-tab="teams"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Équipes &amp;<br>Star Players</span></button>
   <button data-tab="match"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M10 3h4M12 3v3M18.5 6.5l1.5-1.5"/></svg>Timer</button>
+  <button data-tab="fdm"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4M8.5 10h7M8.5 14h7M8.5 18h4"/></svg><span>Feuille<br>de match</span></button>
 </nav>
 
-<script src="data-skills.js?v=31"></script>
-<script src="data-rules.js?v=31"></script>
-<script src="data-teams.js?v=31"></script>
-<script src="data-stars.js?v=31"></script>
-<script src="app.js?v=31"></script>
-<script src="timer.js?v=31"></script>
-<script src="fdm.js?v=31"></script>
+<script src="data-skills.js?v=32"></script>
+<script src="data-rules.js?v=32"></script>
+<script src="data-teams.js?v=32"></script>
+<script src="data-stars.js?v=32"></script>
+<script src="app.js?v=32"></script>
+<script src="timer.js?v=32"></script>
+<script src="fdm.js?v=32"></script>
 <script>
 // Mise à jour automatique : à l'ouverture et au retour sur l'app, on télécharge index.html
 // sans cache et on compare son numéro de version (meta app-version) à celui affiché.
