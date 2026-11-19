@@ -16,8 +16,10 @@ const COLS = ["#d0484a", "#3b8fd9"];            // Équipe 1 rouge, Équipe 2 bl
 
 const newPlayer = () => ({n:"", td:0, reu:0, sor:0, int:0, jpv:false, al:"", ch:"", cc:"", ma:false, bp:false, rc:"", mort:false});
 const newTeam = () => ({nom:"", coach:"", roster:"", bb:false, pub:"", met:"", agr:0, sp:0, cdp:"", tempo:true, fd:"", ach:"", vir:"", enc:"", err:"", pl:[]});
-let S = { j:"", t:[newTeam(), newTeam()] };
+let S = { j:"", met:"", t:[newTeam(), newTeam()] };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.t) S = s; } catch(e){}
+// Météo : un seul champ commun aux deux équipes (ancien format : un par équipe)
+if (S.met === undefined) S.met = METEO.includes(S.t[0].met) ? S.t[0].met : "";
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
 const openSec = new Set(["infos"]);
 let pdfFile = null, pdfUrl = "";
@@ -52,8 +54,7 @@ function infos(){
   ${two("Coach", i => field(i, "coach", "Nom du coach"))}
   ${two("Score", i => `<div class="fd-calc" style="color:${COLS[i]}"><b data-calc="score${i}">${score(i)}</b><small>TD des joueurs</small></div>`)}
   ${two("Public", i => field(i, "pub", "D3 + FD", 'inputmode="numeric"'), "1D3 + Fans Dévoués")}
-  <div class="fd-row"><p class="fd-lbl">Séquence météo</p><div class="fd-two">${[0,1].map(i => field(i, "met", "ex. Conditions idéales")).join("")}</div>
-    <div class="fd-quick">${METEO.map(m => `<button data-add="met" data-v="${esc(m)}">${esc(m)}</button>`).join("")}</div></div>
+  <div class="fd-row"><p class="fd-lbl">Séquence météo</p><select data-met><option value="">—</option>${METEO.map(m => `<option${S.met===m?" selected":""}>${esc(m)}</option>`).join("")}</select></div>
   ${two("Agressions", i => counter(`data-k="agr" data-t="${i}"`, S.t[i].agr))}
   ${two("Sorties Public", i => counter(`data-k="sp" data-t="${i}"`, S.t[i].sp))}
   ${two("Coups de pouce & Prières", i => field(i, "cdp", "Pot-de-vin, Prière…", 'list="fdPrieres"'))}
@@ -134,7 +135,7 @@ document.addEventListener("click", e => {
   if ("fdnew" in d) {
     if (!confirm("Commencer une nouvelle feuille ?\n\nL'équipe 1 (nom, roster, coach) est gardée, tout le reste est effacé.")) return;
     const keep = S.t[0], j = parseInt(S.j, 10);
-    S = { j: isNaN(j) ? "" : String(j + 1), t:[{...newTeam(), nom:keep.nom, roster:keep.roster, coach:keep.coach, bb:keep.bb}, newTeam()] };
+    S = { j: isNaN(j) ? "" : String(j + 1), met:"", t:[{...newTeam(), nom:keep.nom, roster:keep.roster, coach:keep.coach, bb:keep.bb}, newTeam()] };
     prefill(); save(); dropPdf(); render(); return;
   }
   if ("pdf" in d) { makePdf(); return; }
@@ -152,10 +153,6 @@ document.addEventListener("click", e => {
     b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
     save(); dropPdf(); refreshCalc(); return;
   }
-  if ("add" in d) {
-    [0,1].forEach(k => { const cur = S.t[k][d.add]; S.t[k][d.add] = cur ? cur + ", " + d.v : d.v; });
-    save(); dropPdf(); render(); return;
-  }
   if ("addp" in d) { t.pl.push(newPlayer()); save(); render();
     const ins = v.querySelectorAll(`details[data-sec="pl${i}"] [data-p="n"]`); const last = ins[ins.length-1]; if (last) last.focus(); return; }
   if ("del" in d) {
@@ -172,6 +169,7 @@ const onField = e => {
   if (e.type === "change" && el.tagName !== "SELECT") return;
   const d = el.dataset;
   if ("j" in d) S.j = el.value;
+  else if ("met" in d) S.met = el.value;
   else if (d.p) S.t[+d.t].pl[+d.k2][d.p] = el.value;
   else if (d.f) {
     S.t[+d.t][d.f] = el.value;
@@ -228,8 +226,9 @@ async function draw(){
   // Journée
   if (S.j) { c.fillStyle = INK; c.font = FONT(800).replace("{S}", 40); c.textAlign = "left"; c.textBaseline = "alphabetic"; c.fillText(S.j, 345, 216); }
   // Tableau du haut
-  const top = [t => t.nom, t => t.coach, (t, i) => String(score(i)), t => t.pub, t => t.met, t => t.agr ? String(t.agr) : "0", t => t.sp ? String(t.sp) : "0", t => t.cdp];
+  const top = [t => t.nom, t => t.coach, (t, i) => String(score(i)), t => t.pub, () => "", t => t.agr ? String(t.agr) : "0", t => t.sp ? String(t.sp) : "0", t => t.cdp];
   top.forEach((fn, r) => [0,1].forEach(i => fitText(c, fn(S.t[i], i), T1.x + T1.w * (i + 1), rowY(T1, r + 1), T1.w, T1.rows[r + 1], r === 2 ? 30 : 24, r === 2 ? 800 : 600)));
+  [0,1].forEach(i => fitText(c, S.met, T1.x + T1.w * (i + 1), rowY(T1, 5), T1.w, T1.rows[5]));
   // Après-match
   const fdTxt = v => v === "+1" ? "+1" : v === "-1" ? "−1" : v === "=" ? "=" : "";
   const aft = [t => t.tempo ? "OUI" : "NON", (t, i) => gains(i) === null ? "" : po(gains(i)), t => fdTxt(t.fd), t => t.ach, t => t.vir, t => t.enc, t => t.err];
