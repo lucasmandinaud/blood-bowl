@@ -80,8 +80,13 @@ function renderRules(){
   RU.forEach(r => { let g = groups.find(x => x.g === r.g); if (!g) groups.push(g = {g: r.g, l: []}); g.l.push(r); });
   $("#v-rules").innerHTML = groups.map(({g, l}) => `<details class="rgrp"><summary><span>${esc(g)}</span><i>${l.length}</i></summary><div class="rgl">${l.map(r => rowRule(r)).join("")}</div></details>`).join("");
 }
+// Bloc repliable (fermé par défaut) avec, à droite, l'indication des dés
+const fold = (title, dice, inner) => `<details class="rgrp tgrp"><summary><span>${title}</span>${dice ? `<b class="dice">${dice}</b>` : ""}</summary><div class="rgl">${inner}</div></details>`;
 function tableCard(t){
-  return `<div class="card"><h3><span>${t.e} ${esc(t.t)}</span> <span class="dice">${t.dice}</span></h3>${t.rows.map(r=>`<div class="row"><span class="r">${r[0]}</span><div><b>${t.re[r[1]] ? t.re[r[1]] + " " : ""}${esc(r[1])}</b><span>${esc(r[2])}</span></div></div>`).join("")}</div>`;
+  return `<div class="card"><h3><span>${t.e} ${esc(t.t)}</span> <span class="dice">${t.dice}</span></h3>${tableRows(t)}</div>`;
+}
+function tableRows(t){
+  return `${t.rows.map(r=>`<div class="row"><span class="r">${r[0]}</span><div><b>${t.re[r[1]] ? t.re[r[1]] + " " : ""}${esc(r[1])}</b><span>${esc(r[2])}</span></div></div>`).join("")}`;
 }
 // ---------- Passes : diagramme des portées ----------
 const PASSCOL = {R:"#5fbf7a", C:"#e3c84a", L:"#e8893a", B:"#d4232f"};
@@ -129,9 +134,9 @@ function passCard(){
   </div>`;
 }
 function renderTables(){
-  let html = `<h2 class="group">🎲 Antisèche des jets</h2><div class="card mods">${MO.map(m=>`<div class="m"><b>${m.e ? m.e + " " : ""}${esc(m.t)}</b><span>${esc(m.v)}</span></div>`).join("")}</div>`;
-  html += `<h2 class="group">📊 Tableaux</h2>` + TB.map(tableCard).join("");
-  html += `<h2 class="group">🎯 Passes</h2>` + passCard();
+  let html = fold("🎲 Antisèche des jets", "", `<div class="card mods">${MO.map(m=>`<div class="m"><b>${m.e ? m.e + " " : ""}${esc(m.t)}</b><span>${esc(m.v)}</span></div>`).join("")}</div>`);
+  html += TB.map(t => fold(`${t.e} ${esc(t.t)}`, t.dice, `<div class="card">${tableRows(t)}</div>`)).join("");
+  html += fold("🎯 Portées de passe", "CP", passCard().replace(/\s*<h3>.*?<\/h3>/, ""));
   $("#v-tables").innerHTML = html;
 }
 
