@@ -125,9 +125,9 @@ document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const d = b.dataset, i = +(d.t ?? d.addp), t = S.t[i];
   if ("fdnew" in d) {
-    if (!confirm("Commencer une nouvelle feuille ?\n\nL'équipe 1 (nom, roster, coach) est gardée, tout le reste est effacé.")) return;
-    const keep = S.t[0], j = parseInt(S.j, 10);
-    S = { j: isNaN(j) ? "" : String(j + 1), met:"", t:[{...newTeam(), nom:keep.nom, roster:keep.roster, coach:keep.coach, bb:keep.bb}, newTeam()] };
+    if (!confirm("Commencer une nouvelle feuille ?\n\nToute la feuille actuelle est effacée (le n° de journée passe au suivant).")) return;
+    const j = parseInt(S.j, 10);
+    S = { j: isNaN(j) ? "" : String(j + 1), met:"", t:[newTeam(), newTeam()] };
     prefill(); save(); dropPdf(); render(); return;
   }
   if ("pdf" in d) { makePdf(); return; }
