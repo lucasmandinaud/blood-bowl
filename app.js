@@ -75,9 +75,10 @@ function renderSkills(){
   $("#v-skills").innerHTML = html;
 }
 function renderRules(){
-  let html = "", g = "";
-  RU.forEach(r => { if (r.g !== g) { g = r.g; html += `<h2 class="group">${g}</h2>`; } html += rowRule(r); });
-  $("#v-rules").innerHTML = html;
+  // Catégories repliées par défaut : toucher un titre déplie son contenu
+  const groups = [];
+  RU.forEach(r => { let g = groups.find(x => x.g === r.g); if (!g) groups.push(g = {g: r.g, l: []}); g.l.push(r); });
+  $("#v-rules").innerHTML = groups.map(({g, l}) => `<details class="rgrp"><summary><span>${esc(g)}</span><i>${l.length}</i></summary><div class="rgl">${l.map(r => rowRule(r)).join("")}</div></details>`).join("");
 }
 function tableCard(t){
   return `<div class="card"><h3><span>${t.e} ${esc(t.t)}</span> <span class="dice">${t.dice}</span></h3>${t.rows.map(r=>`<div class="row"><span class="r">${r[0]}</span><div><b>${t.re[r[1]] ? t.re[r[1]] + " " : ""}${esc(r[1])}</b><span>${esc(r[2])}</span></div></div>`).join("")}</div>`;
