@@ -52,7 +52,7 @@ function infos(){
   ${two("Nom des équipes", i => field(i, "nom", `Équipe ${i+1}`), "dans l'ordre du site")}
   ${two("Roster", i => `<select data-f="roster" data-t="${i}"><option value="">—</option>${TEAMS.map(n => `<option${S.t[i].roster===n?" selected":""}>${esc(n)}</option>`).join("")}</select>`)}
   ${two("Coach", i => field(i, "coach", "Nom du coach"))}
-  ${two("Score", i => `<div class="fd-calc" style="color:${COLS[i]}"><b data-calc="score${i}">${score(i)}</b><small>TD des joueurs</small></div>`)}
+  ${two("Score", i => `<div class="fd-calc" style="color:${COLS[i]}"><b data-calc="score${i}">${score(i)}</b><small>🔒 auto · TD des joueurs</small></div>`, "non éditable : se remplit avec les TD saisis dans la section Joueurs")}
   ${two("Public", i => field(i, "pub", "D3 + FD", 'inputmode="numeric"'), "1D3 + Fans Dévoués")}
   <div class="fd-row"><p class="fd-lbl">Séquence météo</p><select data-met><option value="">—</option>${METEO.map(m => `<option${S.met===m?" selected":""}>${esc(m)}</option>`).join("")}</select></div>
   ${two("Agressions", i => counter(`data-k="agr" data-t="${i}"`, S.t[i].agr))}
