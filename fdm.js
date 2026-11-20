@@ -63,7 +63,7 @@ function infos(){
 function players(i){
   const t = S.t[i], n7 = t.pl.filter(filled).length > 7;
   return t.pl.map((p, k) => `<div class="fd-pl${p.jpv ? " jpv" : ""}">
-    <div class="fd-ph"><label>N°<input data-p="n" data-t="${i}" data-k2="${k}" value="${esc(p.n)}" inputmode="numeric" autocomplete="off"></label>
+    <div class="fd-ph"><label><span class="fd-nl">N° du<br>joueur</span><input data-p="n" data-t="${i}" data-k2="${k}" value="${esc(p.n)}" inputmode="numeric" autocomplete="off"></label>
       <span class="fd-psp" data-calc="psp${i}-${k}">${psp(p, t.bb)} PSP</span>
       <button class="fd-jpv${p.jpv ? " on" : ""}" data-jpv="${k}" data-t="${i}">⭐ JPV</button>
       <button class="fd-del" data-del="${k}" data-t="${i}" aria-label="Supprimer">✕</button></div>
