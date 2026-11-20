@@ -6,7 +6,6 @@
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const KEY = "bb-fdm";
-const TEAMS = (window.BB_TEAMS || []).map(t => t.n).sort((a,b) => a.localeCompare(b, "fr"));
 const BRUTES = new Set((window.BB_TEAMS || []).filter(t => (t.sr || []).includes("Bagarreurs Brutaux")).map(t => t.n));
 const TBL = id => (window.BB_TABLES || []).find(t => t.id === id || t.id === "t-" + id);
 const METEO = (TBL("meteo")?.rows || []).map(r => r[1]);
@@ -15,7 +14,7 @@ const SKILLS = (window.BB_SKILLS || []).map(s => s.n.replace(/ \(X\+?\)/, ""));
 const COLS = ["#d0484a", "#3b8fd9"];            // Équipe 1 rouge, Équipe 2 bleu (comme la feuille papier)
 
 const newPlayer = () => ({n:"", td:0, reu:0, sor:0, int:0, jpv:false, al:"", ch:"", cc:"", ma:false, bp:false, rc:"", mort:false});
-const newTeam = () => ({nom:"", coach:"", roster:"", bb:false, pub:"", met:"", agr:0, sp:0, cdp:"", tempo:true, fd:"", ach:"", vir:"", enc:"", err:"", pl:[]});
+const newTeam = () => ({nom:"", coach:"", bb:false, pub:"", met:"", agr:0, sp:0, cdp:"", tempo:true, fd:"", ach:"", vir:"", enc:"", err:"", pl:[]});
 let S = { j:"", met:"", t:[newTeam(), newTeam()] };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.t) S = s; } catch(e){}
 // Météo : un seul champ commun aux deux équipes (ancien format : un par équipe)
@@ -50,7 +49,6 @@ const sec = (id, title, body, right = "") => `<details class="rgrp fd-sec" data-
 function infos(){
   return `<div class="fd-row"><p class="fd-lbl">Journée N°</p><input class="fd-j" data-j value="${esc(S.j)}" inputmode="numeric" placeholder="…" autocomplete="off"></div>
   ${two("Nom des équipes", i => field(i, "nom", `Équipe ${i+1}`), "dans l'ordre du site")}
-  ${two("Roster", i => `<select data-f="roster" data-t="${i}"><option value="">—</option>${TEAMS.map(n => `<option${S.t[i].roster===n?" selected":""}>${esc(n)}</option>`).join("")}</select>`)}
   ${two("Coach", i => field(i, "coach", "Nom du coach"))}
   ${two("Score", i => `<div class="fd-calc" style="color:${COLS[i]}"><b data-calc="score${i}">${score(i)}</b><small>🔒 auto · TD des joueurs</small></div>`, "non éditable : se remplit avec les TD saisis dans la section Joueurs")}
   ${two("Public", i => field(i, "pub", "D3 + FD", 'inputmode="numeric"'), "1D3 + Fans Dévoués")}
@@ -58,7 +56,7 @@ function infos(){
   ${two("Agressions", i => counter(`data-k="agr" data-t="${i}"`, S.t[i].agr))}
   ${two("Sorties Public", i => counter(`data-k="sp" data-t="${i}"`, S.t[i].sp))}
   ${two("Coups de pouce & Prières", i => field(i, "cdp", "Pot-de-vin, Prière…", 'list="fdPrieres"'))}
-  ${two("Brawling Brute", i => seg(`data-k="bb" data-t="${i}"`, [[true,"Oui"],[false,"Non"]], S.t[i].bb), "Bagarreurs Brutaux · auto selon le roster")}`;
+  ${two("Brawling Brute", i => seg(`data-k="bb" data-t="${i}"`, [[true,"Oui"],[false,"Non"]], S.t[i].bb), `Bagarreurs Brutaux : ${esc([...BRUTES].sort((a,b)=>a.localeCompare(b,"fr")).join(", "))}`)}`;
 }
 function players(i){
   const t = S.t[i], n7 = t.pl.filter(filled).length > 7;
@@ -156,7 +154,6 @@ const onField = e => {
   else if (d.p) S.t[+d.t].pl[+d.k2][d.p] = el.value;
   else if (d.f) {
     S.t[+d.t][d.f] = el.value;
-    if (d.f === "roster" && el.value) { S.t[+d.t].bb = BRUTES.has(el.value); save(); dropPdf(); render(); return; }
     if (d.f === "nom") { const h = document.querySelectorAll("#v-fdm .fd-heads span"); h.forEach((x, k) => { if (k % 2 === +d.t) x.textContent = teamName(+d.t); }); }
   } else return;
   save(); dropPdf(); refreshCalc();
