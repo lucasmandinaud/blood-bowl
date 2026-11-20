@@ -77,7 +77,7 @@ function players(i){
 }
 function apres(){
   return heads()
-  + two("Bonus Tempo +1", i => seg(`data-k="tempo" data-t="${i}"`, [[true,"Oui"],[false,"Non"]], S.t[i].tempo))
+  + two("Bonus Tempo +1", i => seg(`data-k="tempo" data-t="${i}"`, [[true,"Oui"],[false,"Non"]], S.t[i].tempo), "Non si l'équipe a Temporisé pendant le match")
   + two("Gains", i => `<div class="fd-calc"><b data-calc="gains${i}">${gains(i) === null ? "—" : po(gains(i))}</b><small>(Public total ÷ 2) + TD + Tempo</small></div>`)
   + two("Fans dévoués", i => seg(`data-k="fd" data-t="${i}"`, [["+1","+1"],["=","="],["-1","−1"]], S.t[i].fd))
   + two("Achats joueurs", i => field(i, "ach", "—"))

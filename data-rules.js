@@ -232,7 +232,7 @@ window.BB_RULES = [
 <li><b>Erreurs Coûteuses</b> si Trésorerie ≥ 100 000 po.</li>
 <li><b>Préparer la prochaine rencontre</b> : mettre à jour VE et VEA.</li></ol>`},
 {id:"lg-gains",g:"Ligue",t:"Gains & Fans Dévoués",p:95,k:"gains argent tresorerie affluence fans devoues popularite",b:`
-<div class="formula">Gains = (Affluence ÷ 2 + TD marqués + 1 si personne n'a Temporisé) × 10 000 po</div>
+<div class="formula">Gains = (Affluence ÷ 2 + TD marqués + 1 si l'équipe n'a pas Temporisé) × 10 000 po</div>
 <p class="note">Affluence = Facteur de Popularité des deux équipes additionnés. Ex. : 4 + 3 = 7 → 3,5 + 2 TD + 1 = 6,5 → 65 000 po.</p>
 <p class="lbl"><b>Fans Dévoués</b> (entre 1 et 7)</p>
 <table class="t"><tr><th>Résultat</th><th>Jet D6</th></tr>
