@@ -65,7 +65,7 @@ function players(i){
   return t.pl.map((p, k) => `<div class="fd-pl${p.jpv ? " jpv" : ""}">
     <div class="fd-ph"><label><span class="fd-nl">N° du<br>joueur</span><input data-p="n" data-t="${i}" data-k2="${k}" value="${esc(p.n)}" inputmode="numeric" autocomplete="off"></label>
       <span class="fd-psp" data-calc="psp${i}-${k}">${psp(p, t.bb)} PSP</span>
-      <button class="fd-jpv${p.jpv ? " on" : ""}" data-jpv="${k}" data-t="${i}">⭐ MVP</button>
+      <button class="fd-jpv${p.jpv ? " on" : ""}" data-jpv="${k}" data-t="${i}">⭐ JPV</button>
       <button class="fd-del" data-del="${k}" data-t="${i}" aria-label="Supprimer">✕</button></div>
     <div class="fd-cnts">${[["td","TD"],["reu","Réu"],["sor","Sorties"],["int","Inter"]].map(([f,l]) => `<div><small>${l}</small>${counter(`data-k="${f}" data-t="${i}" data-k2="${k}"`, p[f])}</div>`).join("")}</div>
     <details class="fd-more"${p.al||p.ch||p.cc||p.ma||p.bp||p.rc||p.mort ? " open" : ""}><summary>Compétences & blessures</summary>
@@ -75,7 +75,7 @@ function players(i){
     </details></div>`).join("")
   + `<button class="fd-add" data-addp="${i}">＋ Ajouter un joueur</button>`
   + (n7 ? `<p class="pnote">⚠️ La feuille papier n'a que 7 lignes : seuls les 7 premiers joueurs (par N°) seront dans le PDF.</p>` : "")
-  + `<p class="pnote">PSP indicatifs${t.bb ? " (Brawling Brute : TD 2, Sortie 3)" : ""} · Réu 1, Inter 2, Sortie ${t.bb?3:2}, TD ${t.bb?2:3}, MVP 4.</p>`;
+  + `<p class="pnote">PSP indicatifs${t.bb ? " (Brawling Brute : TD 2, Sortie 3)" : ""} · Réu 1, Inter 2, Sortie ${t.bb?3:2}, TD ${t.bb?2:3}, JPV 4.</p>`;
 }
 function apres(){
   return heads()
