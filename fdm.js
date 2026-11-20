@@ -54,7 +54,7 @@ function infos(){
   ${two("Public", i => field(i, "pub", "D3 + FD", 'inputmode="numeric"'), "1D3 + Fans Dévoués")}
   <div class="fd-row"><p class="fd-lbl">Séquence météo</p><select data-met><option value="">—</option>${METEO.map(m => `<option${S.met===m?" selected":""}>${esc(m)}</option>`).join("")}</select></div>
   ${two("Agressions", i => counter(`data-k="agr" data-t="${i}"`, S.t[i].agr))}
-  ${two("Sorties Public", i => counter(`data-k="sp" data-t="${i}"`, S.t[i].sp))}
+  ${two("Sorties Public", i => counter(`data-k="sp" data-t="${i}"`, S.t[i].sp), "joueurs poussés dans la foule")}
   ${two("Coups de pouce & Prières", i => field(i, "cdp", "Pot-de-vin, Prière…", 'list="fdPrieres"'))}
   ${two("Brawling Brute", i => seg(`data-k="bb" data-t="${i}"`, [[true,"Oui"],[false,"Non"]], S.t[i].bb), `Bagarreurs Brutaux : ${esc([...BRUTES].sort((a,b)=>a.localeCompare(b,"fr")).join(", "))}`)}`;
 }
@@ -65,7 +65,7 @@ function players(i){
       <span class="fd-psp" data-calc="psp${i}-${k}">${psp(p, t.bb)} PSP</span>
       <button class="fd-jpv${p.jpv ? " on" : ""}" data-jpv="${k}" data-t="${i}">⭐ JPV</button>
       <button class="fd-del" data-del="${k}" data-t="${i}" aria-label="Supprimer">✕</button></div>
-    <div class="fd-cnts">${[["td","TD"],["reu","Réu"],["sor","Sorties"],["int","Inter"]].map(([f,l]) => `<div><small>${l}</small>${counter(`data-k="${f}" data-t="${i}" data-k2="${k}"`, p[f])}</div>`).join("")}</div>
+    <div class="fd-cnts">${[["td","TD"],["reu","Réu"],["sor","Sorties","éliminations infligées"],["int","Inter"]].map(([f,l,h]) => `<div><small>${l}${h ? `<i>${h}</i>` : ""}</small>${counter(`data-k="${f}" data-t="${i}" data-k2="${k}"`, p[f])}</div>`).join("")}</div>
     <details class="fd-more"${p.al||p.ch||p.cc||p.ma||p.bp||p.rc||p.mort ? " open" : ""}><summary>Compétences & blessures</summary>
       <div class="fd-sk">${[["al","Aléatoire"],["ch","Choisie"],["cc","Carac ou Comp"]].map(([f,l]) => `<label><small>${l}</small><input data-p="${f}" data-t="${i}" data-k2="${k}" value="${esc(p[f])}" list="fdSkills" autocomplete="off"></label>`).join("")}</div>
       <div class="fd-inj">${[["ma","MA"],["bp","BP"],["mort","☠️ Mort"]].map(([f,l]) => `<button class="${p[f]?"on":""}" data-tog="${f}" data-t="${i}" data-k2="${k}">${l}</button>`).join("")}</div>
